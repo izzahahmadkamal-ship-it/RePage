@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="My Listings - Manage your book listings on RePage.">
+    <title>My Listings | RePage Marketplace</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .listings-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .table-img-preview {
+            width: 45px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
+                <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">R</span>
+                RePage <span class="badge bg-warning text-dark fs-6 ms-2">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">My Orders</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <!-- Header Banner -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-4 shadow-lg listings-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-book-bookmark display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">Vendor Management</span>
+                        <h2 class="fw-bold mb-1 text-white">Manage Your Book Listings</h2>
+                        <p class="text-light opacity-75 mb-0">View and track the status of textbooks you have posted for sale across UiTM Machang.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Toolbar -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5 class="fw-bold text-dark mb-0">Active & Past Listings</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button class="btn btn-warning text-dark fw-semibold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                        <i class="fa-solid fa-plus me-2"></i>Add New Listing
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data Table Card -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-dark" style="background-color: var(--uitm-purple, #4A0E4E);">
+                                    <tr>
+                                        <th class="py-3 ps-4">Book Title</th>
+                                        <th class="py-3">Course Code</th>
+                                        <th class="py-3">Price</th>
+                                        <th class="py-3">Condition</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3 text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Listing 1 -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book4.jpeg" alt="Database Management Systems" class="table-img-preview me-3">
+                                                <div>
+                                                    Database Management Systems 3rd Edition
+                                                    <span class="d-block text-muted small">Posted on 12 Nov 2026</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>CDCS110</td>
+                                        <td>RM 40.00</td>
+                                        <td><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Like New</span></td>
+                                        <td><span class="badge bg-warning text-dark px-2 py-1">Active</span></td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex gap-1 justify-content-end">
+                                                <button class="btn btn-sm btn-outline-primary edit-btn" title="Edit Listing"><i class="fa-solid fa-pen"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger delete-btn" title="Delete Listing"><i class="fa-solid fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Listing 2 -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book5.jpeg" alt="Information Systems Analysis & Design" class="table-img-preview me-3">
+                                                <div>
+                                                    Information Systems Analysis & Design
+                                                    <span class="d-block text-muted small">Posted on 28 Oct 2026</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>SI262</td>
+                                        <td>RM 30.00</td>
+                                        <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Good</span></td>
+                                        <td><span class="badge bg-success text-white px-2 py-1">Sold</span></td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex gap-1 justify-content-end">
+                                                <button class="btn btn-sm btn-outline-primary edit-btn" title="Edit Listing"><i class="fa-solid fa-pen"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger delete-btn" title="Delete Listing"><i class="fa-solid fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add New Listing Modal -->
+    <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark" id="addBookModalLabel"><i class="fa-solid fa-circle-plus text-warning me-2"></i>Post New Textbook Listing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addBookForm">
+                        <div class="mb-3">
+                            <label for="bookTitle" class="form-label fw-semibold small">Book Title</label>
+                            <input type="text" class="form-control" id="bookTitle" placeholder="e.g., Advanced Web Design Guide" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subjectCode" class="form-label fw-semibold small">UiTM Machang Course / Program</label>
+                            <select class="form-select" id="subjectCode" required>
+                                <option value="" selected disabled>Select course code...</option>
+                                <optgroup label="Accountancy">
+                                    <option value="AC220">AC220 - Bachelor of Accounting (Honours)</option>
+                                    <option value="AC110">AC110 - Diploma in Accounting</option>
+                                </optgroup>
+                                <optgroup label="Computer & Mathematical Sciences">
+                                    <option value="CDCS249">CDCS249 - Bachelor of Science (Hons.) Mathematics</option>
+                                    <option value="CS291">CS291 - Bachelor of Science (Hons.) Statistics</option>
+                                    <option value="CDCS240">CDCS240 - Bachelor of Information Technology (Hons.)</option>
+                                    <option value="CDCS241">CDCS241 - Bachelor of Science (Hons.) Statistics</option>
+                                    <option value="CDCS111">CDCS111 - Diploma in Statistics</option>
+                                    <option value="CDCS110">CDCS110 - Diploma in Computer Science</option>
+                                    <option value="CDCS143">CDCS143 - Diploma in Mathematical Sciences</option>
+                                </optgroup>
+                                <optgroup label="Information Management & Muamalat">
+                                    <option value="IC210">IC210 - Bachelor in Muamalat (Honours)</option>
+                                    <option value="SI262">SI262 - Bachelor of Information Science (Hons.) Information System Management</option>
+                                    <option value="SI110">SI110 - Diploma in Information Management</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="bookPrice" class="form-label fw-semibold small">Price (RM)</label>
+                                <input type="number" class="form-control" id="bookPrice" placeholder="e.g., 35.00" min="0" step="0.50" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="bookCondition" class="form-label fw-semibold small">Condition</label>
+                                <select class="form-select" id="bookCondition" required>
+                                    <option value="" selected disabled>Select condition...</option>
+                                    <option value="Like New">Like New</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="bookImage" class="form-label fw-semibold small">Upload Book Cover Photo</label>
+                            <input type="file" class="form-control" id="bookImage" accept="image/*">
+                            <div class="form-text small">Upload a clear photo of your book cover or condition.</div>
+                        </div>
+                        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold py-2 shadow-sm">Publish Listing</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container">
+            <p class="mb-1 text-light small">© 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang • Developed for IMS566</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Interactive CRUD Simulation Script -->
+    <script>
+        let editingRow = null;
+
+        const addBookForm = document.getElementById('addBookForm');
+        const addBookModalEl = document.getElementById('addBookModal');
+        const addBookModal = new bootstrap.Modal(addBookModalEl);
+
+        addBookModalEl.addEventListener('hidden.bs.modal', function () {
+            editingRow = null;
+            addBookForm.reset();
+            document.getElementById('addBookModalLabel').innerHTML = '<i class="fa-solid fa-circle-plus text-warning me-2"></i>Post New Textbook Listing';
+        });
+
+        addBookForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('bookTitle').value;
+            const course = document.getElementById('subjectCode').value;
+            const price = document.getElementById('bookPrice').value;
+            const condition = document.getElementById('bookCondition').value;
+
+            if (editingRow) {
+                editingRow.cells[0].querySelector('div div').childNodes[0].nodeValue = title + " ";
+                editingRow.cells[1].innerText = course;
+                editingRow.cells[2].innerText = `RM ${parseFloat(price).toFixed(2)}`;
+                
+                let badgeClass = 'bg-success-subtle text-success border border-success-subtle';
+                if (condition === 'Good') badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                if (condition === 'Fair') badgeClass = 'bg-secondary-subtle text-secondary border border-secondary-subtle';
+                editingRow.cells[3].innerHTML = `<span class="badge ${badgeClass} px-2 py-1">${condition}</span>`;
+
+                alert('Simulation: Listing updated successfully!');
+            } else {
+                const tableBody = document.querySelector('tbody');
+                const newRow = document.createElement('tr');
+                let badgeClass = 'bg-success-subtle text-success border border-success-subtle';
+                if (condition === 'Good') badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                if (condition === 'Fair') badgeClass = 'bg-secondary-subtle text-secondary border border-secondary-subtle';
+
+                newRow.innerHTML = `
+                    <td class="ps-4 fw-semibold text-dark">
+                        <div class="d-flex align-items-center">
+                            <img src="image/book1.jpeg" alt="Book Cover" class="table-img-preview me-3">
+                            <div>
+                                ${title}
+                                <span class="d-block text-muted small">Posted just now</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${course}</td>
+                    <td>RM ${parseFloat(price).toFixed(2)}</td>
+                    <td><span class="badge ${badgeClass} px-2 py-1">${condition}</span></td>
+                    <td><span class="badge bg-warning text-dark px-2 py-1">Active</span></td>
+                    <td class="text-end pe-4">
+                        <div class="d-flex gap-1 justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary edit-btn" title="Edit Listing"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" title="Delete Listing"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tableBody.prepend(newRow);
+                attachTableListeners();
+                alert('Simulation: New book listing published successfully!');
+            }
+
+            addBookModal.hide();
+            addBookForm.reset();
+            editingRow = null;
+        });
+
+        function attachTableListeners() {
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = function() {
+                    if (confirm('Are you sure you want to delete this listing?')) {
+                        const row = this.closest('tr');
+                        row.remove();
+                    }
+                };
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.onclick = function() {
+                    editingRow = this.closest('tr');
+                    
+                    const titleText = editingRow.cells[0].querySelector('div div').childNodes[0].nodeValue.trim();
+                    const courseText = editingRow.cells[1].innerText.trim();
+                    const priceText = editingRow.cells[2].innerText.replace('RM ', '').trim();
+                    const conditionText = editingRow.cells[3].querySelector('.badge').innerText.trim();
+
+                    document.getElementById('bookTitle').value = titleText;
+                    document.getElementById('subjectCode').value = courseText;
+                    document.getElementById('bookPrice').value = priceText;
+                    document.getElementById('bookCondition').value = conditionText;
+
+                    document.getElementById('addBookModalLabel').innerHTML = '<i class="fa-solid fa-pen-to-square text-warning me-2"></i>Edit Textbook Listing';
+
+                    addBookModal.show();
+                };
+            });
+        }
+
+        attachTableListeners();
+    </script>
+</body>
+</html>

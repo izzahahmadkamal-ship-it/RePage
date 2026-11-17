@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Messages & Inquiries - RePage Student Marketplace">
+    <title>Messages | RePage Marketplace</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .messages-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .chat-sidebar {
+            border-right: 1px solid #dee2e6;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .chat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .chat-list-item:hover, .chat-list-item.active {
+            background-color: #f1f3f5;
+        }
+        .chat-messages-body {
+            height: 380px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigation Bar (Clean Text-Only Style) -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
+                <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">R</span>
+                RePage <span class="badge bg-warning text-dark fs-6 ms-2">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">My Orders</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            
+            <!-- Header Banner -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-4 shadow-lg messages-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-comments display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">Shopee-Style Chat Hub</span>
+                        <h2 class="fw-bold mb-1 text-white">Student Inquiries & Chats</h2>
+                        <p class="text-light opacity-75 mb-0">Coordinate textbook meetups securely with senior sellers across UiTM Machang.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Box Card -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                        <div class="row g-0">
+                            
+                            <!-- Left Sidebar: List of Conversations -->
+                            <div class="col-md-4 chat-sidebar p-0" id="chatSidebarList">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+
+                            <!-- Right Main Area: Active Chat Window -->
+                            <div class="col-md-8 d-flex flex-column" id="activeChatWindow">
+                                <div class="p-4 text-center text-muted my-auto">
+                                    <i class="fa-solid fa-comments fs-1 text-warning mb-2"></i>
+                                    <p class="mb-0">Select a conversation from the left to view messages.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container">
+            <p class="mb-1 text-light small">© 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang • Developed for IMS566</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chat Logic Script -->
+    <script>
+        function getStoredConversations() {
+            let messages = JSON.parse(localStorage.getItem('repageMessages')) || [];
+            if (messages.length === 0) {
+                messages = [
+                    {
+                        id: 'MSG-98421',
+                        title: 'Bahasa Mandarin Moden Komprehensif (2)',
+                        code: 'ALL',
+                        seller: 'Aiman Zikri',
+                        message: 'Hi, is this textbook still available? Let me know when you are free for a campus meetup!',
+                        location: 'Student Centre',
+                        status: 'Awaiting Seller Reply',
+                        date: '02 Nov 2026',
+                        replies: []
+                    }
+                ];
+                localStorage.setItem('repageMessages', JSON.stringify(messages));
+            }
+            return messages;
+        }
+
+        function renderChatSidebar(selectedIndex = 0) {
+            const conversations = getStoredConversations();
+            const sidebar = document.getElementById('chatSidebarList');
+            sidebar.innerHTML = '';
+
+            if (conversations.length === 0) {
+                sidebar.innerHTML = '<div class="p-4 text-center text-muted small">No inquiries found.</div>';
+                return;
+            }
+
+            conversations.forEach((conv, index) => {
+                const isActive = (index === selectedIndex) ? 'active' : '';
+                const itemHTML = `
+                    <div class="p-3 border-bottom chat-list-item ${isActive}" onclick="selectConversation(${index})">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-dark small">${conv.seller}</strong>
+                            <span class="text-muted" style="font-size: 0.75rem;">${conv.date}</span>
+                        </div>
+                        <p class="mb-1 text-dark fw-semibold text-truncate" style="font-size: 0.85rem;">${conv.title}</p>
+                        <p class="mb-0 text-muted small text-truncate">${conv.message}</p>
+                    </div>
+                `;
+                sidebar.innerHTML += itemHTML;
+            });
+
+            // Automatically open the first chat on load
+            if (conversations.length > 0 && selectedIndex < conversations.length) {
+                renderActiveChat(selectedIndex);
+            }
+        }
+
+        function selectConversation(index) {
+            // Update active state in sidebar
+            document.querySelectorAll('.chat-list-item').forEach((el, idx) => {
+                if (idx === index) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            renderActiveChat(index);
+        }
+
+        function renderActiveChat(index) {
+            const conversations = getStoredConversations();
+            const conv = conversations[index];
+            const chatWindow = document.getElementById('activeChatWindow');
+
+            let repliesHTML = '';
+            if (conv.replies && conv.replies.length > 0) {
+                conv.replies.forEach(rep => {
+                    if (rep.sender === 'You') {
+                        repliesHTML += `
+                            <div class="mb-3 text-end">
+                                <span class="badge bg-secondary mb-1">You (${rep.time})</span>
+                                <p class="small bg-white p-2 rounded border mb-0 text-dark d-inline-block text-start shadow-sm" style="max-width: 80%;">${rep.text}</p>
+                            </div>
+                        `;
+                    } else {
+                        repliesHTML += `
+                            <div class="mb-3 text-start">
+                                <span class="badge bg-warning text-dark mb-1">${conv.seller} (${rep.time})</span>
+                                <p class="small bg-warning-subtle p-2 rounded border border-warning-subtle mb-0 text-dark d-inline-block shadow-sm" style="max-width: 80%;">${rep.text}</p>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            chatWindow.innerHTML = `
+                <!-- Chat Header -->
+                <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0">${conv.seller}</h6>
+                        <span class="text-muted" style="font-size: 0.8rem;"><i class="fa-solid fa-book me-1 text-warning"></i>${conv.title} (${conv.code})</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">Meetup: ${conv.location}</span>
+                </div>
+
+                <!-- Chat Messages Body -->
+                <div class="chat-messages-body p-3" id="chatMessagesBody">
+                    <!-- Initial Buyer Message -->
+                    <div class="mb-3 text-end">
+                        <span class="badge bg-secondary mb-1">You (${conv.date})</span>
+                        <p class="small bg-white p-2 rounded border mb-0 text-dark d-inline-block text-start shadow-sm" style="max-width: 80%;">${conv.message}</p>
+                    </div>
+
+                    <!-- Default Seller Response simulation if no replies yet -->
+                    <div class="mb-3 text-start">
+                        <span class="badge bg-warning text-dark mb-1">${conv.seller}</span>
+                        <p class="small bg-warning-subtle p-2 rounded border border-warning-subtle mb-0 text-dark d-inline-block shadow-sm" style="max-width: 80%;">Hi! Yes, the book is available. We can meet up at ${conv.location} this week as requested.</p>
+                    </div>
+
+                    ${repliesHTML}
+                </div>
+
+                <!-- Chat Input Footer -->
+                <div class="p-3 border-top bg-white">
+                    <form onsubmit="sendChatMessage(event, ${index})" class="input-group">
+                        <input type="text" id="chatReplyInput" class="form-control form-control-sm" placeholder="Type a message to ${conv.seller}..." required>
+                        <button type="submit" class="btn btn-warning text-dark btn-sm fw-semibold px-4">Send</button>
+                    </form>
+                </div>
+            `;
+
+            // Scroll chat to bottom
+            const body = document.getElementById('chatMessagesBody');
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function sendChatMessage(e, index) {
+            e.preventDefault();
+            const input = document.getElementById('chatReplyInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            let conversations = getStoredConversations();
+            if (!conversations[index].replies) {
+                conversations[index].replies = [];
+            }
+
+            conversations[index].replies.push({
+                sender: 'You',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            localStorage.setItem('repageMessages', JSON.stringify(conversations));
+            input.value = '';
+            renderActiveChat(index);
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            renderChatSidebar(0);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="My Orders - Track your textbook requests and meetups on RePage.">
+    <title>My Orders | RePage Marketplace</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .orders-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .table-img-preview {
+            width: 45px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigation Bar (Clean Text-Only Style) -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
+                <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">R</span>
+                RePage <span class="badge bg-warning text-dark fs-6 ms-2">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="orders.html">My Orders</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <!-- Header Banner -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-4 shadow-lg orders-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-box-archive display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">Transaction Tracking</span>
+                        <h2 class="fw-bold mb-1 text-white">My Book Orders & Requests</h2>
+                        <p class="text-light opacity-75 mb-0">Track active meetup reservations, payment statuses, and coordinate with senior sellers across UiTM Machang.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Toolbar -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5 class="fw-bold text-dark mb-0">Active Reservations</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="marketplace.html" class="btn btn-warning text-dark fw-semibold px-4 shadow-sm">
+                        <i class="fa-solid fa-store me-2"></i>Browse More Books
+                    </a>
+                </div>
+            </div>
+
+            <!-- Orders Table Card -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-dark" style="background-color: var(--uitm-purple, #4A0E4E);">
+                                    <tr>
+                                        <th class="py-3 ps-4">Order ID & Title</th>
+                                        <th class="py-3">Course Code</th>
+                                        <th class="py-3">Seller</th>
+                                        <th class="py-3">Meetup Location</th>
+                                        <th class="py-3">Payment</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3 text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody">
+                                    <!-- Dynamic rows loaded from localStorage will appear here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Simplified Mobile-Friendly Footer -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container">
+            <p class="mb-1 text-light small">&copy; 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang &bull; Developed for IMS566</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Order Management & LocalStorage Script -->
+    <script>
+        function loadOrders() {
+            const tableBody = document.getElementById('ordersTableBody');
+            let orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+
+            // Default sample order if storage is empty so lecturer sees populated data immediately
+            if (orders.length === 0) {
+                orders = [
+                    {
+                        id: 'ORD-548120',
+                        title: 'Bahasa Mandarin Moden Komprehensif (2)',
+                        code: 'TMC451',
+                        seller: 'Aiman Zikri',
+                        price: 'RM 22.00',
+                        location: 'Student Centre',
+                        payment: 'Cash on Delivery',
+                        status: 'Pending Meetup',
+                        date: '14 Nov 2026'
+                    }
+                ];
+                localStorage.setItem('repageOrders', JSON.stringify(orders));
+            }
+
+            tableBody.innerHTML = '';
+
+            orders.forEach((order, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4 fw-semibold text-dark">
+                        <div class="d-flex align-items-center">
+                            <img src="image/book1.jpeg" alt="Book Cover" class="table-img-preview me-3">
+                            <div>
+                                ${order.title}
+                                <span class="d-block text-muted small">ID: ${order.id} &bull; Requested on ${order.date}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${order.code}</td>
+                    <td>${order.seller}</td>
+                    <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-location-dot text-danger me-1"></i>${order.location}</span></td>
+                    <td><span class="badge bg-info-subtle text-info border border-info-subtle">${order.payment}</span></td>
+                    <td><span class="badge bg-warning text-dark px-2 py-1">${order.status}</span></td>
+                    <td class="text-end pe-4">
+                        <div class="d-flex gap-1 justify-content-end">
+                            <button class="btn btn-sm btn-outline-success" onclick="completeOrder(${index})" title="Mark as Completed"><i class="fa-solid fa-check"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(${index})" title="Cancel Request"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function completeOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+            alert(`Order ${orders[index].id} marked as completed! This transaction has been recorded to your dashboard savings.`);
+            orders.splice(index, 1); // Remove from active orders
+            localStorage.setItem('repageOrders', JSON.stringify(orders));
+            loadOrders();
+        }
+
+        function cancelOrder(index) {
+            if (confirm('Are you sure you want to cancel this book request? The item will be released back to the marketplace.')) {
+                let orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+                orders.splice(index, 1);
+                localStorage.setItem('repageOrders', JSON.stringify(orders));
+                loadOrders();
+                alert('Order request cancelled. The book is now available again in the marketplace.');
+            }
+        }
+
+        // Load orders on page startup
+        window.onload = loadOrders;
+    </script>
+</body>
+</html>

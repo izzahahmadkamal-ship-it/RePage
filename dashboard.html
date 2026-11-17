@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard - Repage Student Secondhand Marketplace">
+    <title>Dashboard | RePage Marketplace</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .table-img-preview {
+            width: 45px;
+            height: 55px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .table-img-preview:hover {
+            transform: scale(1.08);
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigation Bar (Clean Text-Only Style matching Marketplace) -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
+                <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">R</span>
+                RePage <span class="badge bg-warning text-dark fs-6 ms-2">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">My Orders</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <!-- Welcome Header (Futuristic Gradient Banner) -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-4 shadow-lg dashboard-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-chart-line display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">UiTM Machang Hub</span>
+                        <h2 class="fw-bold mb-1 text-white">Welcome back, <span id="userNameDisplay" class="text-warning">Sarah</span>!</h2>
+                        <p class="text-light opacity-75 mb-0">Here is your live analytics overview and campus second-hand textbook exchange history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-warning text-dark p-3 rounded-4 me-3 fs-3 shadow-sm">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Active Listings</h6>
+                                <h3 class="fw-bold mb-0 text-dark">3 Books</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-warning text-dark p-3 rounded-4 me-3 fs-3 shadow-sm">
+                                <i class="fa-solid fa-bag-shopping"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Books Purchased</h6>
+                                <h3 class="fw-bold mb-0 text-dark">5 Books</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-warning text-dark p-3 rounded-4 me-3 fs-3 shadow-sm">
+                                <i class="fa-solid fa-coins"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Estimated Savings</h6>
+                                <h3 class="fw-bold mb-0 text-dark">RM 145.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Visualisation Section (Rubric Requirement) -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-chart-bar text-warning me-2"></i>Average Secondhand Textbook Price (RM) by UiTM Machang Faculty</h5>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fa-solid fa-circle-dot me-1"></i> Live Analytics</span>
+                        </div>
+                        <hr class="text-muted opacity-25">
+                        <div style="position: relative; height:320px; width:100%">
+                            <canvas id="facultyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase History Section (All 5 Completed Orders with Correct Images & Codes) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                        <div class="p-4 border-bottom bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i>Recent Purchase History</h5>
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> 5 Completed Orders</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-dark" style="background-color: var(--uitm-purple, #4A0E4E);">
+                                    <tr>
+                                        <th class="py-3 ps-4">Book Title</th>
+                                        <th class="py-3">Course Code</th>
+                                        <th class="py-3">Seller</th>
+                                        <th class="py-3">Price Paid</th>
+                                        <th class="py-3">Date Purchased</th>
+                                        <th class="py-3 text-end pe-4">Receipt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Order 1: Mandarin 1 -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book1.jpeg" alt="Bahasa Mandarin Moden Komprehensif 1" class="table-img-preview rounded shadow-sm me-3 zoomable-img" title="Click to enlarge">
+                                                <span>Bahasa Mandarin Moden Komprehensif (1)</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">TMC401</span></td>
+                                        <td>Aiman Zikri</td>
+                                        <td class="fw-bold text-success">RM 20.00</td>
+                                        <td>02 Nov 2026</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark px-3" onclick="alert('Downloading digital receipt simulation for Order #RP-98421...');"><i class="fa-solid fa-download me-1"></i> Receipt</button>
+                                        </td>
+                                    </tr>
+                                    <!-- Order 2: Mandarin 2 -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book2.jpeg" alt="Bahasa Mandarin Moden Komprehensif 2" class="table-img-preview rounded shadow-sm me-3 zoomable-img" title="Click to enlarge">
+                                                <span>Bahasa Mandarin Moden Komprehensif (2)</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">TMC451</span></td>
+                                        <td>Farah Hani</td>
+                                        <td class="fw-bold text-success">RM 22.00</td>
+                                        <td>28 Oct 2026</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark px-3" onclick="alert('Downloading digital receipt simulation for Order #RP-98422...');"><i class="fa-solid fa-download me-1"></i> Receipt</button>
+                                        </td>
+                                    </tr>
+                                    <!-- Order 3: Entrepreneurship -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book3.jpeg" alt="Fundamentals of Entrepreneurship" class="table-img-preview rounded shadow-sm me-3 zoomable-img" title="Click to enlarge">
+                                                <span>Fundamentals of Entrepreneurship</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">ENT300</span></td>
+                                        <td>Siti Nurhaliza</td>
+                                        <td class="fw-bold text-success">RM 25.00</td>
+                                        <td>15 Oct 2026</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark px-3" onclick="alert('Downloading digital receipt simulation for Order #RP-98423...');"><i class="fa-solid fa-download me-1"></i> Receipt</button>
+                                        </td>
+                                    </tr>
+                                    <!-- Order 4: Database Management -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book4.jpeg" alt="Database Management Systems" class="table-img-preview rounded shadow-sm me-3 zoomable-img" title="Click to enlarge">
+                                                <span>Database Management Systems (3rd Ed)</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">CSC301</span></td>
+                                        <td>Amirul Hakim</td>
+                                        <td class="fw-bold text-success">RM 35.00</td>
+                                        <td>10 Oct 2026</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark px-3" onclick="alert('Downloading digital receipt simulation for Order #RP-98424...');"><i class="fa-solid fa-download me-1"></i> Receipt</button>
+                                        </td>
+                                    </tr>
+                                    <!-- Order 5: Financial Accounting -->
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <img src="image/book5.jpeg" alt="Introduction to Financial Accounting" class="table-img-preview rounded shadow-sm me-3 zoomable-img" title="Click to enlarge">
+                                                <span>Introduction to Financial Accounting</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">AC110</span></td>
+                                        <td>Nur Aina</td>
+                                        <td class="fw-bold text-success">RM 30.00</td>
+                                        <td>24 Sep 2026</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark px-3" onclick="alert('Downloading digital receipt simulation for Order #RP-98425...');"><i class="fa-solid fa-download me-1"></i> Receipt</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Image Lightbox Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow-lg text-white" style="background-color: var(--uitm-purple, #4A0E4E);">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold" id="imageModalTitle"><i class="fa-solid fa-book-open text-warning me-2"></i>Textbook Cover Preview</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <img id="fullImagePreview" src="" alt="Full Book Preview" class="img-fluid rounded-3 shadow" style="max-height: 70vh; object-fit: contain;">
+                </div>
+                <div class="modal-footer border-top border-secondary justify-content-center">
+                    <button type="button" class="btn btn-warning text-dark fw-semibold px-4" data-bs-dismiss="modal">Close Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simplified Mobile-Friendly Footer (Aligned with Marketplace) -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container">
+            <p class="mb-1 text-light small">© 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang • Developed for IMS566</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Dynamic User Greeting Script -->
+    <script>
+        const storedName = localStorage.getItem('repageUserName');
+        if (storedName && storedName.trim() !== '') {
+            document.getElementById('userNameDisplay').innerText = storedName;
+        } else {
+            document.getElementById('userNameDisplay').innerText = 'Sarah';
+        }
+    </script>
+
+    <!-- Image Lightbox Script -->
+    <script>
+        const imageModalEl = document.getElementById('imageModal');
+        const imageModal = new bootstrap.Modal(imageModalEl);
+
+        document.querySelectorAll('.zoomable-img').forEach(img => {
+            img.addEventListener('click', function() {
+                const src = this.getAttribute('src');
+                const alt = this.getAttribute('alt');
+                
+                document.getElementById('fullImagePreview').setAttribute('src', src);
+                document.getElementById('imageModalTitle').innerHTML = `<i class="fa-solid fa-book-open text-warning me-2"></i>${alt}`;
+                
+                imageModal.show();
+            });
+        });
+    </script>
+
+    <!-- Chart.js Script Implementation -->
+    <script>
+        const ctx = document.getElementById('facultyChart').getContext('2d');
+        const facultyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    'Accountancy (AC)', 
+                    'Computer & Math Sciences (FSKM)', 
+                    'Information Management (IM)', 
+                    'Business & Management (BM)', 
+                    'Administrative Science & Policy (AM)'
+                ],
+                datasets: [{
+                    label: 'Avg Secondhand Price (RM)',
+                    data: [32, 35, 30, 28, 26],
+                    backgroundColor: 'rgba(255, 193, 7, 0.85)',
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

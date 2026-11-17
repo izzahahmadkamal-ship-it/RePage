@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Marketplace - Browse student secondhand books on RePage.">
+    <title>Marketplace | RePage Marketplace</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .marketplace-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .product-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 .75rem 1.5rem rgba(74, 14, 78, 0.15) !important;
+        }
+        .product-card img {
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        .product-card img:hover {
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
+                <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">R</span>
+                RePage <span class="badge bg-warning text-dark fs-6 ms-2">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">My Orders</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Marketplace Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            
+            <!-- Header Banner -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-4 shadow-lg marketplace-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-store display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">Peer-to-Peer Hub</span>
+                        <h2 class="fw-bold mb-1 text-white">Student Marketplace</h2>
+                        <p class="text-light opacity-75 mb-0">Browse affordable secondhand textbooks posted directly by seniors across faculties at UiTM Machang.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Controls Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="row g-3 align-items-center">
+                    <!-- Search Input -->
+                    <div class="col-lg-5">
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Search title, course code, author...">
+                        </div>
+                    </div>
+                    <!-- Course Dropdown Filter -->
+                    <div class="col-lg-4">
+                        <div class="input-group shadow-sm">
+                            <label class="input-group-text bg-white fw-semibold small text-muted"><i class="fa-solid fa-filter text-warning"></i></label>
+                            <select class="form-select text-truncate" id="courseDropdownFilter">
+                                <option value="all">All Courses / Programs</option>
+                                <optgroup label="Accountancy">
+                                    <option value="AC220">AC220 - Bachelor of Accounting</option>
+                                    <option value="AC110">AC110 - Diploma in Accounting</option>
+                                </optgroup>
+                                <optgroup label="Computer & Math Sciences">
+                                    <option value="CDCS240">CDCS240 - Bachelor of IT</option>
+                                    <option value="CDCS110">CDCS110 - Diploma in Computer Science</option>
+                                    <option value="CS291">CS291 - Bachelor of Statistics</option>
+                                    <option value="CDCS249">CDCS249 - Bachelor of Mathematics</option>
+                                </optgroup>
+                                <optgroup label="University Core">
+                                    <option value="ALL">ALL - Universal Subjects / Languages</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Status Filter Badges -->
+                    <div class="col-lg-3">
+                        <div class="btn-group w-100 shadow-sm" role="group">
+                            <input type="radio" class="btn-check status-filter" name="statusRadio" id="statusAll" value="all" checked>
+                            <label class="btn btn-outline-dark btn-sm fw-semibold" for="statusAll">All</label>
+
+                            <input type="radio" class="btn-check status-filter" name="statusRadio" id="statusAvailable" value="available">
+                            <label class="btn btn-outline-success btn-sm fw-semibold" for="statusAvailable">Available</label>
+
+                            <input type="radio" class="btn-check status-filter" name="statusRadio" id="statusReserved" value="reserved">
+                            <label class="btn btn-outline-secondary btn-sm fw-semibold" for="statusReserved">Reserved</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Cards Grid (10 Books) -->
+            <div class="row g-4" id="bookGrid">
+                
+                <!-- Book 1: Mandarin 2 -->
+                <div class="col-md-4 book-item" data-category="ALL" data-status="available" data-id="book-1">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (95%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book1.jpeg" alt="Bahasa Mandarin Moden Komprehensif 2" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">ALL • Mandatory 3rd Language</span>
+                            <h5 class="fw-bold text-dark mb-2">Bahasa Mandarin Moden Komprehensif (2)</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Essential third language textbook for all students. Clean pages with vocabulary lists.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 22.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Bahasa Mandarin Moden Komprehensif (2)" data-code="ALL" data-price="22.00" data-seller="Aiman Zikri">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 2: Mandarin 1 -->
+                <div class="col-md-4 book-item" data-category="ALL" data-status="available" data-id="book-2">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-1 condition-badge">Good (80%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book2.jpeg" alt="Bahasa Mandarin Moden Komprehensif 1" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">ALL • Mandatory 3rd Language</span>
+                            <h5 class="fw-bold text-dark mb-2">Bahasa Mandarin Moden Komprehensif (1)</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Foundational Mandarin textbook required for all courses. Light notes inside.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 18.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Bahasa Mandarin Moden Komprehensif (1)" data-code="TMC401" data-price="18.00" data-seller="Afiqah Zainal">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 3: Entrepreneurship -->
+                <div class="col-md-4 book-item" data-category="ALL" data-status="available" data-id="book-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (90%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book3.jpeg" alt="Fundamentals of Entrepreneurship" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">ENT300 • University Core</span>
+                            <h5 class="fw-bold text-dark mb-2">Fundamentals of Entrepreneurship</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Mandatory subject textbook for all students across diploma and degree programs.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 25.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Fundamentals of Entrepreneurship" data-code="ENT300" data-price="25.00" data-seller="Siti Nurhaliza">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 4: Management Accounting -->
+                <div class="col-md-4 book-item" data-category="AC220" data-status="available" data-id="book-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-1 condition-badge">Good (75%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book4.jpeg" alt="Management Accounting to Forensic" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">AC220 • Accountancy Degree</span>
+                            <h5 class="fw-bold text-dark mb-2">From Management Accounting to Forensic & Sustainability</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Advanced accounting reference guide exploring forensic auditing and sustainable business practices.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 38.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="From Management Accounting to Forensic & Sustainability" data-code="AC220" data-price="38.00" data-seller="Farhan Iskandar">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 5: Intro to Accounting -->
+                <div class="col-md-4 book-item" data-category="AC110" data-status="available" data-id="book-5">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (90%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book5.jpeg" alt="Introduction to Accounting" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">AC110 • Diploma in Accounting</span>
+                            <h5 class="fw-bold text-dark mb-2">Introduction to Financial Accounting</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Core textbook for first-year accounting diploma students covering debit, credit, and ledgers.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 30.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Introduction to Financial Accounting" data-code="AC110" data-price="30.00" data-seller="Nur Aina">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 6: Basic Cost Accounting -->
+                <div class="col-md-4 book-item" data-category="AC220" data-status="available" data-id="book-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-1 condition-badge">Good (70%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book6.jpeg" alt="Basic Cost Accounting" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">AC220 • Accountancy</span>
+                            <h5 class="fw-bold text-dark mb-2">Basic Cost Accounting Principles & Practice</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Covers overhead allocation, job costing, and budget variances. Essential for business modules.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 26.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Basic Cost Accounting Principles & Practice" data-code="AC220" data-price="26.00" data-seller="Amirul Haikal">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 7: Basic Statistic -->
+                <div class="col-md-4 book-item" data-category="CS291" data-status="available" data-id="book-7">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (95%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book7.jpeg" alt="Basic Statistic" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">CS291 • Statistics & Data Analysis</span>
+                            <h5 class="fw-bold text-dark mb-2">Basic Statistics for Science and Social Sciences</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Clear mathematical breakdown of descriptive stats, hypothesis testing, and regressions.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 28.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Basic Statistics for Science and Social Sciences" data-code="CS291" data-price="28.00" data-seller="Mohd Zulfikar">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 8: Statistics and Probability -->
+                <div class="col-md-4 book-item" data-category="CDCS249" data-status="available" data-id="book-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-1 condition-badge">Good (75%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book8.jpeg" alt="Review on Statistics and Probability" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">CDCS249 • Mathematics & Stats</span>
+                            <h5 class="fw-bold text-dark mb-2">Review on Statistics and Probability Distributions</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Advanced review book featuring worked examples for probability theory and statistical modeling.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 32.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Review on Statistics and Probability Distributions" data-code="CDCS249" data-price="32.00" data-seller="Nurul Huda">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 9: Arabic for All -->
+                <div class="col-md-4 book-item" data-category="ALL" data-status="available" data-id="book-9">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (90%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book9.jpeg" alt="Arabic for All" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">ALL • 3rd Language Option</span>
+                            <h5 class="fw-bold text-dark mb-2">Arabic for All (Bahasa Arab Komunikasi)</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Popular third language elective option. Neat handwriting notes and grammar charts included.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 20.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Arabic for All (Bahasa Arab Komunikasi)" data-code="ALL" data-price="20.00" data-seller="Luqman Hakim">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book 10: Big Data Analytics -->
+                <div class="col-md-4 book-item" data-category="CDCS240" data-status="available" data-id="book-10">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 bg-white product-card">
+                        <div class="position-relative bg-light text-center rounded-top-4 overflow-hidden" style="height: 200px;">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 z-1 condition-badge">Like New (95%)</span>
+                            <span class="badge bg-success text-white position-absolute top-0 end-0 m-3 z-1 status-badge">Available</span>
+                            <img src="image/book10.jpeg" alt="Big Data Analytics" class="w-100 h-100 object-fit-cover zoomable-img" title="Click to view full image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small fw-semibold mb-1">CDCS240 • Information Technology</span>
+                            <h5 class="fw-bold text-dark mb-2">Big Data: Analytic and Evaluation of Organisational Goals</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">Advanced IT text focusing on data pipelines, business intelligence, and evaluating corporate metrics.</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <div>
+                                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Price</span>
+                                    <span class="fw-bold text-dark fs-5">RM 45.00</span>
+                                </div>
+                                <button class="btn btn-warning text-dark btn-sm fw-semibold px-3 request-btn shadow-sm" 
+                                        data-book="Big Data: Analytic and Evaluation of Organisational Goals" data-code="CDCS240" data-price="45.00" data-seller="Daniel Ariff">
+                                    Request Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Simulated In-App Inquiry & Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 p-3 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-paper-plane text-warning me-2"></i>Inquire & Request Textbook</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Send a secure inquiry message to the senior seller. You can track their response under your <strong>Messages</strong> page.</p>
+                    
+                    <div class="bg-light p-3 rounded-3 mb-3 border">
+                        <p class="mb-1 small"><strong>Book:</strong> <span id="modalBookTitle">Book Title</span></p>
+                        <p class="mb-1 small"><strong>Course Code:</strong> <span id="modalBookCode">Code</span></p>
+                        <p class="mb-0 small"><strong>Seller:</strong> <span id="modalSellerName">Seller Name</span> (Verified Student)</p>
+                    </div>
+
+                    <form id="checkoutForm">
+                        <input type="hidden" id="hiddenBookId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Message / Offer to Seller</label>
+                            <textarea class="form-control form-control-sm" id="buyerMessage" rows="3" required>Hi, is this textbook still available? Let me know when you are free for a campus meetup!</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Preferred Meetup Location (UiTM Machang)</label>
+                            <select class="form-select form-select-sm" id="meetupLocation">
+                                <option>Student Centre</option>
+                                <option>Perpustakaan Tengku Anis (PTA)</option>
+                                <option>Block A</option>
+                                <option>Block B</option>
+                                <option>Block C</option>
+                                <option>Block D</option>
+                                <option>Administration Building</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Transaction / Payment Method</label>
+                            <select class="form-select form-select-sm" id="paymentMethod">
+                                <option value="COD">Cash on Delivery (COD during Meetup)</option>
+                                <option value="Online Transfer">Manual Online Transfer / Reference Receipt</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold shadow-sm py-2">
+                            Send Inquiry & Reserve Book
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow-lg text-white" style="background-color: var(--uitm-purple, #4A0E4E);">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold" id="imageModalTitle"><i class="fa-solid fa-book-open text-warning me-2"></i>Textbook Cover Preview</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <img id="fullImagePreview" src="" alt="Full Book Preview" class="img-fluid rounded-3 shadow" style="max-height: 70vh; object-fit: contain;">
+                </div>
+                <div class="modal-footer border-top border-secondary justify-content-center">
+                    <button type="button" class="btn btn-warning text-dark fw-semibold px-4" data-bs-dismiss="modal">Close Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+        <div class="container">
+            <p class="mb-1 text-light small">© 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang • Developed for IMS566</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Marketplace Interaction & State Synchronization Script -->
+    <script>
+        const checkoutModalEl = document.getElementById('checkoutModal');
+        const checkoutModal = new bootstrap.Modal(checkoutModalEl);
+        
+        const imageModalEl = document.getElementById('imageModal');
+        const imageModal = new bootstrap.Modal(imageModalEl);
+
+        let selectedBookCard = null;
+
+        // Synchronise reserve button
+        window.addEventListener('DOMContentLoaded', function() {
+            let orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+            
+            orders.forEach(order => {
+                document.querySelectorAll('.book-item').forEach(item => {
+                    const titleEl = item.querySelector('h5');
+                    if (titleEl && titleEl.innerText.trim() === order.title.trim()) {
+                        item.setAttribute('data-status', 'reserved');
+                        const statusBadge = item.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.className = 'badge bg-secondary text-white position-absolute top-0 end-0 m-3 z-1 status-badge';
+                            statusBadge.innerText = 'Reserved';
+                        }
+
+                        const reqBtn = item.querySelector('.request-btn');
+                        if (reqBtn) {
+                            reqBtn.className = 'btn btn-secondary btn-sm fw-semibold px-3 disabled';
+                            reqBtn.innerText = 'Reserved';
+                        }
+                    }
+                });
+            });
+        });
+
+        // Image Lightbox Zoom Functionality
+        document.querySelectorAll('.zoomable-img').forEach(img => {
+            img.addEventListener('click', function() {
+                const src = this.getAttribute('src');
+                const alt = this.getAttribute('alt');
+                
+                document.getElementById('fullImagePreview').setAttribute('src', src);
+                document.getElementById('imageModalTitle').innerHTML = `<i class="fa-solid fa-book-open text-warning me-2"></i>${alt}`;
+                
+                imageModal.show();
+            });
+        });
+
+        // Trigger checkout modal when clicking "Request Book"
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('request-btn')) {
+                const btn = e.target;
+                const title = btn.getAttribute('data-book');
+                const code = btn.getAttribute('data-code');
+                const price = btn.getAttribute('data-price');
+                const seller = btn.getAttribute('data-seller');
+                
+                selectedBookCard = btn.closest('.book-item');
+                const bookId = selectedBookCard.getAttribute('data-id');
+
+                document.getElementById('modalBookTitle').innerText = title;
+                document.getElementById('modalBookCode').innerText = code;
+                document.getElementById('modalSellerName').innerText = seller;
+                document.getElementById('hiddenBookId').value = bookId;
+
+                checkoutModal.show();
+            }
+        });
+
+        // Handle Order Request & In-App Message Submission
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('modalBookTitle').innerText;
+            const code = document.getElementById('modalBookCode').innerText;
+            const seller = document.getElementById('modalSellerName').innerText;
+            const message = document.getElementById('buyerMessage').value;
+            const location = document.getElementById('meetupLocation').value;
+            const payment = document.getElementById('paymentMethod').value;
+
+            // Save to localStorage for "Messages" page
+            let messages = JSON.parse(localStorage.getItem('repageMessages')) || [];
+            const newMsg = {
+                id: 'MSG-' + Math.floor(100000 + Math.random() * 900000),
+                title: title,
+                code: code,
+                seller: seller,
+                message: message,
+                location: location,
+                status: 'Awaiting Seller Reply',
+                date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            };
+            messages.unshift(newMsg);
+            localStorage.setItem('repageMessages', JSON.stringify(messages));
+
+            // Save to localStorage for "My Orders" page
+            let orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+            const newOrder = {
+                id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+                title: title,
+                code: code,
+                seller: seller,
+                price: 'RM 25.00',
+                location: location,
+                payment: payment,
+                status: 'Pending Meetup',
+                date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            };
+            orders.unshift(newOrder);
+            localStorage.setItem('repageOrders', JSON.stringify(orders));
+
+            // Update card status to Reserved immediately on UI
+            if (selectedBookCard) {
+                selectedBookCard.setAttribute('data-status', 'reserved');
+                const statusBadge = selectedBookCard.querySelector('.status-badge');
+                statusBadge.className = 'badge bg-secondary text-white position-absolute top-0 end-0 m-3 z-1 status-badge';
+                statusBadge.innerText = 'Reserved';
+
+                const reqBtn = selectedBookCard.querySelector('.request-btn');
+                reqBtn.className = 'btn btn-secondary btn-sm fw-semibold px-3 disabled';
+                reqBtn.innerText = 'Reserved';
+            }
+
+            checkoutModal.hide();
+            alert('Inquiry sent successfully! You can view seller responses under the Messages page.');
+        });
+
+        // Combined Filter Logic
+        function filterBooks() {
+            const courseVal = document.getElementById('courseDropdownFilter').value;
+            const statusVal = document.querySelector('input.status-filter:checked').value;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            document.querySelectorAll('.book-item').forEach(item => {
+                const category = item.getAttribute('data-category');
+                const status = item.getAttribute('data-status');
+                const text = item.innerText.toLowerCase();
+
+                const matchCourse = (courseVal === 'all' || category === courseVal);
+                const matchStatus = (statusVal === 'all' || status === statusVal);
+                const matchSearch = text.includes(searchVal);
+
+                if (matchCourse && matchStatus && matchSearch) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('courseDropdownFilter').addEventListener('change', filterBooks);
+        document.querySelectorAll('.status-filter').forEach(radio => {
+            radio.addEventListener('change', filterBooks);
+        });
+        document.getElementById('searchInput').addEventListener('input', filterBooks);
+    </script>
+</body>
+</html>
