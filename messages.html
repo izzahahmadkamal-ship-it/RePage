@@ -193,26 +193,26 @@
                     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100 d-flex flex-column">
 
                         <!-- Active Chat Header -->
-                        <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between gap-2 flex-nowrap">
+                        <div class="p-3 bg-white border-bottom d-flex align-items-start justify-content-between gap-2 flex-nowrap">
                             <!-- Mobile Back Arrow Button -->
-                            <button type="button" class="btn btn-outline-secondary btn-sm d-md-none flex-shrink-0" onclick="showMobileList()" aria-label="Back to conversations" title="Back to conversations">
+                            <button type="button" class="btn btn-outline-secondary btn-sm d-md-none flex-shrink-0 mt-1" onclick="showMobileList()" aria-label="Back to conversations" title="Back to conversations">
                                 <i class="fa-solid fa-arrow-left"></i>
                             </button>
 
-                            <!-- Seller & Textbook / Meetup Info -->
+                            <!-- Seller & Textbook / Meetup Info (wraps naturally onto 2-3 lines without pushing delete button) -->
                             <div class="flex-grow-1 min-w-0">
-                                <div class="d-flex align-items-center gap-2 min-w-0">
-                                    <h5 class="fw-bold text-dark mb-0 text-truncate" id="activeSellerName">Select a conversation</h5>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <h5 class="fw-bold text-dark mb-0 text-break" id="activeSellerName">Select a conversation</h5>
                                     <span class="badge bg-warning text-dark flex-shrink-0 d-none" id="activeCourseBadge">CODE</span>
                                 </div>
-                                <p class="text-muted small mb-1 text-truncate" id="activeBookTitle">Choose a chat from the list to view meetup details</p>
-                                <span class="badge bg-light text-dark border text-truncate mw-100 d-none" id="activeMeetupBadge">
+                                <p class="text-muted small mb-1 text-break" id="activeBookTitle">Choose a chat from the list to view meetup details</p>
+                                <span class="badge bg-light text-dark border text-wrap text-start d-none" id="activeMeetupBadge">
                                     <i class="fa-solid fa-location-dot text-danger me-1"></i><span id="activeMeetupText">Student Centre</span>
                                 </span>
                             </div>
 
-                            <!-- Delete Chat Trashbin Button -->
-                            <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 d-none" id="deleteChatBtn" onclick="promptDeleteChat()" aria-label="Delete chat" title="Delete chat">
+                            <!-- Delete Chat Trashbin Button (always stays visible on the right) -->
+                            <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 mt-1 d-none" id="deleteChatBtn" onclick="promptDeleteChat()" aria-label="Delete chat" title="Delete chat">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
