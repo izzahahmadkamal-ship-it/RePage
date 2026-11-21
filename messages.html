@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +135,7 @@
                                 <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light">
                                     <div class="d-flex align-items-center">
                                         <!-- Back button for mobile view -->
-                                        <button class="btn btn-sm btn-outline-secondary me-2 d-md-none" id="backToListBtn" onclick="showChatListMobile()">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 d-md-none" id="backToListBtn" onclick="showChatListMobile()">
                                             <i class="fa-solid fa-arrow-left"></i>
                                         </button>
                                         <div>
@@ -142,7 +143,21 @@
                                             <small class="text-muted" id="activeChatSub">Click any chat thread on the left to start messaging</small>
                                         </div>
                                     </div>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small" id="activeChatBadge">Active</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small" id="activeChatBadge">Active</span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger d-none" id="deleteChatBtn" onclick="requestDeleteCurrentChat()" title="Delete Conversation">
+                                            <i class="fa-solid fa-trash-can me-1"></i><span class="d-none d-sm-inline">Delete Chat</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Inline Delete Confirmation Banner (avoids browser confirm dialogs) -->
+                                <div class="alert alert-warning d-none m-3 mb-0 py-2 px-3 d-flex align-items-center justify-content-between small" id="deleteConfirmBanner" role="alert">
+                                    <span id="deleteConfirmText">Delete this conversation?</span>
+                                    <div class="d-flex gap-2 ms-2">
+                                        <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="confirmDeleteCurrentChat()">Delete</button>
+                                        <button type="button" class="btn btn-sm btn-secondary py-0 px-2" onclick="cancelDeleteCurrentChat()">Cancel</button>
+                                    </div>
                                 </div>
 
                                 <!-- Messages Scrollable Area -->
@@ -184,12 +199,16 @@
 
     <!-- Messaging State & Responsive JS -->
     <script>
+        const CHAT_STORAGE_KEY = 'repageMessages';
+        const CHAT_INITIALIZED_KEY = 'repageMessagesInitialized';
         let currentChatId = null;
+        let chatsCache = [];
+        let pendingDeleteChatId = null;
 
-        // Default initial chats if none in localStorage
+        // Default initial chats used only when the chat store has never been initialized
         const defaultChats = [
             {
-                id: 1,
+                id: 'chat-demo-1',
                 seller: 'Aiman Zikri',
                 book: 'Bahasa Mandarin Moden Komprehensif (2)',
                 code: 'TMC451',
@@ -201,7 +220,7 @@
                 ]
             },
             {
-                id: 2,
+                id: 'chat-demo-2',
                 seller: 'Siti Nurhaliza',
                 book: 'Fundamentals of Entrepreneurship',
                 code: 'ENT300',
@@ -214,13 +233,226 @@
             }
         ];
 
-        function getChats() {
-            let chats = JSON.parse(localStorage.getItem('repageMessages'));
-            if (!chats) {
-                chats = defaultChats;
-                localStorage.setItem('repageMessages', JSON.stringify(chats));
+        function formatDisplayDate() {
+            const now = new Date();
+            return now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function normalizeChatThread(raw, fallbackIndex = 0) {
+            if (!raw || typeof raw !== 'object') return null;
+
+            const seller = raw.seller || raw.sellerName || raw.name || raw.partner || 'Campus Seller';
+            const book = raw.book || raw.bookTitle || raw.title || raw.item || 'Academic Textbook';
+            const code = raw.code || raw.courseCode || raw.subjectCode || '';
+            const meetup = raw.meetup || raw.location || raw.meetupLocation || 'Student Centre';
+            const dateStr = raw.date || raw.time || formatDisplayDate();
+
+            let msgs = [];
+            if (Array.isArray(raw.messages) && raw.messages.length > 0) {
+                msgs = raw.messages.map(m => ({
+                    sender: m.sender === 'seller' ? 'seller' : 'buyer',
+                    text: m.text || m.message || m.body || '',
+                    time: m.time || m.date || dateStr
+                })).filter(m => m.text.trim() !== '');
+            } else if (typeof raw.message === 'string' && raw.message.trim() !== '') {
+                msgs = [{ sender: 'buyer', text: raw.message.trim(), time: dateStr }];
             }
-            return chats;
+
+            if (msgs.length === 0) {
+                msgs = [{
+                    sender: 'buyer',
+                    text: `Hi ${seller}, I just reserved "${book}"${code ? ` (${code})` : ''}. Are you free to meet at ${meetup}?`,
+                    time: dateStr
+                }];
+            }
+
+            return {
+                id: String(raw.id || raw.chatId || raw.orderId || `chat-${Date.now()}-${fallbackIndex}`),
+                seller: seller,
+                book: book,
+                code: code,
+                meetup: meetup,
+                date: dateStr,
+                messages: msgs
+            };
+        }
+
+        function saveChatsToStorage(chats) {
+            const safeChats = Array.isArray(chats) ? chats : [];
+            chatsCache = safeChats;
+            try {
+                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(safeChats));
+                localStorage.setItem(CHAT_INITIALIZED_KEY, 'true');
+            } catch (err) {
+                console.warn('Unable to save chats to localStorage:', err);
+            }
+            return safeChats;
+        }
+
+        function loadBaseChatsFromStorage() {
+            let parsed = null;
+            try {
+                const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+                if (raw !== null) {
+                    parsed = JSON.parse(raw);
+                }
+            } catch (err) {
+                console.warn('Unable to parse stored chats:', err);
+            }
+
+            if (Array.isArray(parsed)) {
+                return parsed.map((item, idx) => normalizeChatThread(item, idx)).filter(Boolean);
+            }
+
+            // First-time visit: seed demo chats once and mark store as initialized
+            const hasInitialized = localStorage.getItem(CHAT_INITIALIZED_KEY) === 'true';
+            if (!hasInitialized) {
+                const seeded = defaultChats.map(c => ({ ...c, messages: c.messages.map(m => ({ ...m })) }));
+                return saveChatsToStorage(seeded);
+            }
+
+            return saveChatsToStorage([]);
+        }
+
+        function syncIncomingReservationsAndChats(existingChats) {
+            let chats = Array.isArray(existingChats) ? [...existingChats] : [];
+            let focusId = null;
+            let changed = false;
+
+            const addOrMergeThread = (candidate, shouldFocus = false) => {
+                const normalized = normalizeChatThread(candidate, chats.length);
+                if (!normalized) return;
+
+                const existingIdx = chats.findIndex(c =>
+                    String(c.id) === String(normalized.id) ||
+                    (c.seller.toLowerCase() === normalized.seller.toLowerCase() &&
+                     c.book.toLowerCase() === normalized.book.toLowerCase() &&
+                     c.meetup.toLowerCase() === normalized.meetup.toLowerCase())
+                );
+
+                if (existingIdx !== -1) {
+                    if (shouldFocus) focusId = chats[existingIdx].id;
+                } else {
+                    chats.unshift(normalized);
+                    changed = true;
+                    if (shouldFocus) focusId = normalized.id;
+                }
+            };
+
+            // 1. Consume one-time pending chat payloads created when reserving in marketplace.html
+            const pendingKeys = ['repage_pending_chat', 'repagePendingChat', 'repageNewReservationChat'];
+            for (const pKey of pendingKeys) {
+                try {
+                    const rawPending = localStorage.getItem(pKey);
+                    if (rawPending) {
+                        const parsedPending = JSON.parse(rawPending);
+                        addOrMergeThread(parsedPending, true);
+                        localStorage.removeItem(pKey);
+                        changed = true;
+                    }
+                } catch (err) {
+                    console.warn(`Unable to parse ${pKey}:`, err);
+                }
+            }
+
+            // 2. Check reservations flagged with fromMarketplaceReserve in repageOrders
+            try {
+                const orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
+                if (Array.isArray(orders)) {
+                    orders.forEach((order, idx) => {
+                        if (order && order.fromMarketplaceReserve && (order.title || order.book)) {
+                            const orderBook = order.title || order.book;
+                            const orderSeller = order.seller || 'Campus Seller';
+                            const threadId = `res-${order.id || idx}`;
+                            const alreadyExists = chats.some(c =>
+                                String(c.id) === String(threadId) ||
+                                (c.book.toLowerCase() === orderBook.toLowerCase() &&
+                                 c.seller.toLowerCase() === orderSeller.toLowerCase())
+                            );
+                            if (!alreadyExists) {
+                                addOrMergeThread({
+                                    id: threadId,
+                                    seller: orderSeller,
+                                    book: orderBook,
+                                    code: order.code || '',
+                                    meetup: order.location || order.meetup || 'Student Centre',
+                                    date: order.date || formatDisplayDate(),
+                                    messages: [
+                                        {
+                                            sender: 'buyer',
+                                            text: `Hi ${orderSeller}, I just reserved "${orderBook}"${order.code ? ` (${order.code})` : ''} for meetup at ${order.location || 'Student Centre'}.`,
+                                            time: order.date || formatDisplayDate()
+                                        }
+                                    ]
+                                }, idx === 0);
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn('Unable to inspect repageOrders:', err);
+            }
+
+            // 3. Check URL query or hash parameters if navigated with chat details
+            try {
+                const params = new URLSearchParams(window.location.search);
+                let hashParams = new URLSearchParams();
+                if (window.location.hash && window.location.hash.includes('=')) {
+                    const cleanHash = window.location.hash.replace(/^#\/?/, '');
+                    hashParams = new URLSearchParams(cleanHash);
+                }
+
+                const getParam = (name) => params.get(name) || hashParams.get(name);
+                const paramSeller = getParam('seller') || getParam('sellerName');
+                const paramBook = getParam('book') || getParam('title') || getParam('bookTitle');
+                const paramCode = getParam('code') || getParam('courseCode') || '';
+                const paramMeetup = getParam('meetup') || getParam('location') || 'Student Centre';
+                const paramMsg = getParam('message') || '';
+
+                if (paramSeller || paramBook) {
+                    const resolvedSeller = paramSeller || 'Campus Seller';
+                    const resolvedBook = paramBook || 'Reserved Textbook';
+                    const existingMatch = chats.find(c =>
+                        c.seller.toLowerCase() === resolvedSeller.toLowerCase() &&
+                        c.book.toLowerCase() === resolvedBook.toLowerCase()
+                    );
+
+                    if (existingMatch) {
+                        focusId = existingMatch.id;
+                    } else {
+                        const dateNow = formatDisplayDate();
+                        addOrMergeThread({
+                            id: `url-${Date.now()}`,
+                            seller: resolvedSeller,
+                            book: resolvedBook,
+                            code: paramCode,
+                            meetup: paramMeetup,
+                            date: dateNow,
+                            messages: [
+                                {
+                                    sender: 'buyer',
+                                    text: paramMsg || `Hi ${resolvedSeller}, I'm interested in reserving "${resolvedBook}"${paramCode ? ` (${paramCode})` : ''} at ${paramMeetup}.`,
+                                    time: dateNow
+                                }
+                            ]
+                        }, true);
+                    }
+                }
+            } catch (err) {
+                console.warn('Unable to parse URL parameters:', err);
+            }
+
+            if (changed) {
+                saveChatsToStorage(chats);
+            } else {
+                chatsCache = chats;
+            }
+
+            return { chats, focusId };
+        }
+
+        function getChats() {
+            return chatsCache;
         }
 
         function renderChatList() {
@@ -228,9 +460,21 @@
             const listEl = document.getElementById('chatThreadsList');
             listEl.innerHTML = '';
 
-            chats.forEach((chat, index) => {
+            if (chats.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-4 text-center text-muted small">
+                        <i class="fa-regular fa-comments fs-3 mb-2 d-block opacity-50"></i>
+                        No active conversations yet.<br>
+                        <a href="marketplace.html" class="btn btn-sm btn-warning text-dark fw-semibold mt-2">Browse Marketplace</a>
+                    </div>
+                `;
+                return;
+            }
+
+            chats.forEach((chat) => {
                 const lastMsg = chat.messages[chat.messages.length - 1];
-                const isActive = currentChatId === chat.id ? 'active' : '';
+                const isActive = String(currentChatId) === String(chat.id) ? 'active' : '';
+                const codeLabel = chat.code ? ` (${chat.code})` : '';
                 
                 const item = document.createElement('div');
                 item.className = `list-group-item list-group-item-action p-3 chat-item ${isActive}`;
@@ -238,9 +482,9 @@
                 item.innerHTML = `
                     <div class="d-flex w-100 justify-content-between align-items-center mb-1">
                         <h6 class="mb-0 fw-bold text-dark">${chat.seller}</h6>
-                        <small class="text-muted" style="font-size: 0.75rem;">${lastMsg ? lastMsg.time : ''}</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">${lastMsg ? lastMsg.time : chat.date}</small>
                     </div>
-                    <p class="mb-1 text-secondary small fw-semibold text-truncate">${chat.book} (${chat.code})</p>
+                    <p class="mb-1 text-secondary small fw-semibold text-truncate">${chat.book}${codeLabel}</p>
                     <small class="text-muted text-truncate d-block" style="font-size: 0.82rem;">${lastMsg ? lastMsg.text : 'No messages yet'}</small>
                 `;
                 listEl.appendChild(item);
@@ -249,6 +493,7 @@
 
         function selectChat(id) {
             currentChatId = id;
+            cancelDeleteCurrentChat();
             renderChatList();
             renderActiveChatWindow();
 
@@ -260,18 +505,51 @@
         }
 
         function showChatListMobile() {
+            cancelDeleteCurrentChat();
             document.getElementById('chatListCol').classList.remove('mobile-hidden');
             document.getElementById('chatWindowCol').classList.add('mobile-hidden');
         }
 
         function renderActiveChatWindow() {
             const chats = getChats();
-            const chat = chats.find(c => c.id === currentChatId);
+            const chat = chats.find(c => String(c.id) === String(currentChatId));
             const messagesArea = document.getElementById('chatMessagesArea');
+            const deleteBtn = document.getElementById('deleteChatBtn');
+            const badgeEl = document.getElementById('activeChatBadge');
+            const msgInput = document.getElementById('messageInput');
+            const sendBtn = document.querySelector('#messageForm button[type="submit"]');
 
-            if (!chat) return;
+            if (!chat) {
+                currentChatId = null;
+                cancelDeleteCurrentChat();
+                document.getElementById('activeChatTitle').innerText = 'Select a conversation';
+                document.getElementById('activeChatSub').innerText = chats.length > 0
+                    ? 'Click any chat thread on the left to start messaging'
+                    : 'Reserve a textbook on the Marketplace to start a chat';
+                badgeEl.className = 'badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 small';
+                badgeEl.innerText = 'Idle';
+                deleteBtn.classList.add('d-none');
+                msgInput.disabled = true;
+                sendBtn.disabled = true;
 
-            document.getElementById('activeChatTitle').innerText = `${chat.seller} - ${chat.book}`;
+                messagesArea.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fa-regular fa-comment-dots display-4 mb-2 opacity-50"></i>
+                        <p class="small mb-2">No conversation selected.</p>
+                        ${chats.length === 0 ? '<a href="marketplace.html" class="btn btn-sm btn-warning text-dark fw-semibold">Go to Marketplace</a>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            msgInput.disabled = false;
+            sendBtn.disabled = false;
+            deleteBtn.classList.remove('d-none');
+            badgeEl.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small';
+            badgeEl.innerText = 'Active';
+
+            const codePart = chat.code ? ` (${chat.code})` : '';
+            document.getElementById('activeChatTitle').innerText = `${chat.seller} - ${chat.book}${codePart}`;
             document.getElementById('activeChatSub').innerHTML = `<i class="fa-solid fa-location-dot text-danger me-1"></i>Meetup Location: ${chat.meetup}`;
 
             messagesArea.innerHTML = '';
@@ -294,6 +572,48 @@
             messagesArea.scrollTop = messagesArea.scrollHeight;
         }
 
+        function requestDeleteCurrentChat() {
+            if (!currentChatId) return;
+            const target = chatsCache.find(c => String(c.id) === String(currentChatId));
+            if (!target) return;
+
+            pendingDeleteChatId = target.id;
+            const banner = document.getElementById('deleteConfirmBanner');
+            const label = document.getElementById('deleteConfirmText');
+            label.textContent = `Delete chat with ${target.seller} (${target.book})?`;
+            banner.classList.remove('d-none');
+        }
+
+        function cancelDeleteCurrentChat() {
+            pendingDeleteChatId = null;
+            const banner = document.getElementById('deleteConfirmBanner');
+            if (banner) {
+                banner.classList.add('d-none');
+            }
+        }
+
+        function confirmDeleteCurrentChat() {
+            if (!pendingDeleteChatId) return;
+
+            const updated = chatsCache.filter(c => String(c.id) !== String(pendingDeleteChatId));
+            saveChatsToStorage(updated);
+            pendingDeleteChatId = null;
+            cancelDeleteCurrentChat();
+
+            if (updated.length === 0) {
+                currentChatId = null;
+                renderChatList();
+                renderActiveChatWindow();
+                if (window.innerWidth < 768) {
+                    showChatListMobile();
+                }
+            } else {
+                currentChatId = updated[0].id;
+                renderChatList();
+                renderActiveChatWindow();
+            }
+        }
+
         function sendChatMessage(e) {
             e.preventDefault();
             if (!currentChatId) return;
@@ -302,34 +622,52 @@
             const text = input.value.trim();
             if (!text) return;
 
-            let chats = getChats();
-            const chatIndex = chats.findIndex(c => c.id === currentChatId);
-
+            const chatIndex = chatsCache.findIndex(c => String(c.id) === String(currentChatId));
             if (chatIndex !== -1) {
-                const now = new Date();
-                const timeStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                
-                chats[chatIndex].messages.push({
+                const timeStr = formatDisplayDate();
+                chatsCache[chatIndex].messages.push({
                     sender: 'buyer',
                     text: text,
                     time: timeStr
                 });
 
-                localStorage.setItem('repageMessages', JSON.stringify(chats));
+                saveChatsToStorage(chatsCache);
                 input.value = '';
                 renderChatList();
                 renderActiveChatWindow();
             }
         }
 
+        // Listen for cross-tab or storage updates from marketplace reservations
+        window.addEventListener('storage', function(event) {
+            if ([CHAT_STORAGE_KEY, 'repage_pending_chat', 'repageOrders'].includes(event.key)) {
+                const base = loadBaseChatsFromStorage();
+                const synced = syncIncomingReservationsAndChats(base);
+                if (!currentChatId && synced.chats.length > 0) {
+                    currentChatId = synced.chats[0].id;
+                }
+                renderChatList();
+                renderActiveChatWindow();
+            }
+        });
+
         // Initialize on load
         window.onload = function() {
-            const chats = getChats();
+            const baseChats = loadBaseChatsFromStorage();
+            const synced = syncIncomingReservationsAndChats(baseChats);
+            const chats = synced.chats;
+
             if (chats.length > 0) {
-                selectChat(chats[0].id);
+                const hasCurrent = currentChatId && chats.some(c => String(c.id) === String(currentChatId));
+                const targetId = synced.focusId || (hasCurrent ? currentChatId : chats[0].id);
+                selectChat(targetId);
+            } else {
+                renderChatList();
+                renderActiveChatWindow();
             }
+
             // Responsive mobile view check
-            if (window.innerWidth < 768) {
+            if (window.innerWidth < 768 && chats.length > 0 && !synced.focusId) {
                 document.getElementById('chatWindowCol').classList.add('mobile-hidden');
             }
         };
