@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Messages - Coordinate textbook meetups on RePage.">
+    <meta name="description" content="Messages - Coordinate textbook meetups securely with senior sellers on RePage.">
     <title>Messages | RePage Marketplace</title>
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,69 +12,101 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .chat-sidebar {
-            background-color: #fff;
-            border-right: 1px solid rgba(0,0,0,0.08);
-            height: calc(100vh - 200px);
-            min-height: 450px;
+        .messages-hero {
+            background: linear-gradient(135deg, rgba(74, 14, 78, 0.95), rgba(27, 42, 74, 0.95));
+            border-radius: 1rem;
+            color: white;
+        }
+        .chat-list-container {
+            max-height: 520px;
             overflow-y: auto;
         }
-        .chat-item {
+        .chat-thread-item {
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
             border-left: 4px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
-        .chat-item:hover {
+        .chat-thread-item:hover {
             background-color: #f8f9fa;
         }
-        .chat-item.active {
-            background-color: #fdf8f6;
+        .chat-thread-item.active {
+            background-color: #fcf5ff;
             border-left-color: var(--uitm-purple, #4A0E4E);
         }
-        .chat-messages-container {
-            height: 380px;
-            overflow-y: auto;
-            background-color: #f9fafb;
-        }
-        .message-bubble {
-            max-width: 75%;
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
+        .seller-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: rgba(74, 14, 78, 0.1);
+            color: var(--uitm-purple, #4A0E4E);
+            font-weight: 700;
             font-size: 0.95rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-        .message-incoming {
-            background-color: #fff;
-            color: #333;
-            border: 1px solid #eaeaea;
-            border-top-left-radius: 0.25rem;
+        .chat-messages-box {
+            height: 400px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
         }
-        .message-outgoing {
+        .chat-bubble {
+            max-width: 80%;
+            border-radius: 1rem;
+            padding: 0.7rem 1rem;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            word-wrap: break-word;
+        }
+        .chat-bubble-you {
             background-color: var(--uitm-purple, #4A0E4E);
-            color: #fff;
-            border-top-right-radius: 0.25rem;
+            color: #ffffff;
+            border-bottom-right-radius: 0.25rem;
         }
-        /* Mobile responsive toggling view classes */
+        .chat-bubble-seller {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .quick-reply-btn {
+            font-size: 0.78rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        /* Mobile-Only Single-Pane Toggle (< 768px) — Never stacks both panels vertically */
         @media (max-width: 767.98px) {
-            .mobile-hidden {
-                display: none !important;
+            .chat-list-container {
+                max-height: none;
             }
-            .mobile-show {
+            .chat-messages-box {
+                height: 52vh;
+                min-height: 280px;
+            }
+            .chat-bubble {
+                max-width: 88%;
+            }
+            .mobile-show-list #chatListCol {
                 display: block !important;
             }
-            .chat-sidebar {
-                height: auto;
-                min-height: auto;
+            .mobile-show-list #chatActiveCol {
+                display: none !important;
             }
-            .chat-messages-container {
-                height: 300px;
+            .mobile-show-chat #chatListCol {
+                display: none !important;
+            }
+            .mobile-show-chat #chatActiveCol {
+                display: block !important;
             }
         }
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
 
-    <!-- Navigation Bar -->
+    <!-- Navigation Bar (Exact match with marketplace.html) -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--uitm-purple, #4A0E4E);">
         <div class="container py-2">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="dashboard.html">
@@ -86,598 +118,770 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="marketplace.html">Marketplace</a></li>
-                    <li class="nav-item"><a class="nav-link active fw-semibold" href="messages.html">Messages</a></li>
-                    <li class="nav-item"><a class="nav-link" href="my-listings.html">My Listings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="orders.html">My Orders</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="messages.html">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-listings.html">My Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">My Orders</a>
+                    </li>
                     <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages');">Logout</a>
+                        <a class="btn btn-outline-light btn-sm px-3 fw-semibold w-100" href="index.html" onclick="localStorage.removeItem('repageOrders'); localStorage.removeItem('repageMessages'); localStorage.removeItem('repageDeletedMsgs'); localStorage.removeItem('repageMessagesInitialized');">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow-1 py-4">
+    <!-- Main Messages Content -->
+    <main class="flex-grow-1 py-5">
         <div class="container">
-            <div class="row mb-3">
+
+            <!-- Header Banner (Exact match with .marketplace-hero) -->
+            <div class="row mb-4">
                 <div class="col-12">
-                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-comments me-2 text-warning"></i>Student Messaging Hub</h3>
-                    <p class="text-muted small">Communicate securely with senior sellers or buyers regarding textbook pickups across campus.</p>
+                    <div class="p-4 shadow-lg messages-hero position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
+                            <i class="fa-solid fa-comments display-1 text-warning"></i>
+                        </div>
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-semibold rounded-pill">In-App Chat</span>
+                        <h2 class="fw-bold mb-1 text-white">Student Messages</h2>
+                        <p class="text-light opacity-75 mb-0">Coordinate textbook meetups securely with senior sellers across UiTM Machang.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Chat Application Card Wrapper -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-                        <div class="row g-0">
-                            
-                            <!-- Left Column: Chat Threads List -->
-                            <div class="col-md-4 chat-sidebar p-0" id="chatListCol">
-                                <div class="p-3 border-bottom bg-light">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search conversations...">
-                                    </div>
-                                </div>
-                                <div class="list-group list-group-flush" id="chatThreadsList">
-                                    <!-- Populated via JavaScript -->
-                                </div>
+            <!-- Responsive 2-Column Chat Interface (Single-pane toggle on mobile, side-by-side on desktop) -->
+            <div class="row g-4 mobile-show-list" id="messagesWrapper">
+
+                <!-- Left Column: Conversations List -->
+                <div class="col-12 col-md-4" id="chatListCol">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
+                        <div class="p-3 bg-white border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold text-dark mb-0">
+                                    <i class="fa-solid fa-inbox text-warning me-2"></i>Conversations
+                                    <span class="badge bg-dark rounded-pill ms-1" id="chatCountBadge">0</span>
+                                </h6>
+                                <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="restoreDemoChats()" title="Restore demo chats">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>Demo
+                                </button>
                             </div>
-
-                            <!-- Right Column: Active Chat Window -->
-                            <div class="col-md-8 d-flex flex-column bg-white" id="chatWindowCol">
-                                <!-- Chat Header -->
-                                <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light">
-                                    <div class="d-flex align-items-center">
-                                        <!-- Back button for mobile view -->
-                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 d-md-none" id="backToListBtn" onclick="showChatListMobile()">
-                                            <i class="fa-solid fa-arrow-left"></i>
-                                        </button>
-                                        <div>
-                                            <h6 class="fw-bold mb-0 text-dark" id="activeChatTitle">Select a conversation</h6>
-                                            <small class="text-muted" id="activeChatSub">Click any chat thread on the left to start messaging</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small" id="activeChatBadge">Active</span>
-                                        <button type="button" class="btn btn-sm btn-outline-danger d-none" id="deleteChatBtn" onclick="requestDeleteCurrentChat()" title="Delete Conversation">
-                                            <i class="fa-solid fa-trash-can me-1"></i><span class="d-none d-sm-inline">Delete Chat</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Inline Delete Confirmation Banner (avoids browser confirm dialogs) -->
-                                <div class="alert alert-warning d-none m-3 mb-0 py-2 px-3 d-flex align-items-center justify-content-between small" id="deleteConfirmBanner" role="alert">
-                                    <span id="deleteConfirmText">Delete this conversation?</span>
-                                    <div class="d-flex gap-2 ms-2">
-                                        <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="confirmDeleteCurrentChat()">Delete</button>
-                                        <button type="button" class="btn btn-sm btn-secondary py-0 px-2" onclick="cancelDeleteCurrentChat()">Cancel</button>
-                                    </div>
-                                </div>
-
-                                <!-- Messages Scrollable Area -->
-                                <div class="p-3 chat-messages-container flex-grow-1" id="chatMessagesArea">
-                                    <div class="text-center text-muted py-5">
-                                        <i class="fa-regular fa-comment-dots display-4 mb-2 opacity-50"></i>
-                                        <p class="small">No conversation selected.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Message Input Box -->
-                                <div class="p-3 border-top bg-light">
-                                    <form id="messageForm" class="d-flex gap-2" onsubmit="sendChatMessage(event)">
-                                        <input type="text" id="messageInput" class="form-control" placeholder="Type your message about meetup details..." autocomplete="off" required>
-                                        <button type="submit" class="btn btn-warning text-dark fw-semibold px-4 shadow-sm">
-                                            <i class="fa-solid fa-paper-plane me-1"></i> Send
-                                        </button>
-                                    </form>
-                                </div>
+                            <!-- Search Input styled identically to marketplace.html -->
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                                <input type="text" id="chatSearchInput" class="form-control border-start-0 ps-0" placeholder="Search seller, title, course code...">
                             </div>
+                        </div>
 
+                        <div class="chat-list-container" id="chatListBody">
+                            <!-- Conversations rendered dynamically from repageMessages -->
                         </div>
                     </div>
                 </div>
+
+                <!-- Right Column: Active Chat Panel -->
+                <div class="col-12 col-md-8" id="chatActiveCol">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100 d-flex flex-column">
+
+                        <!-- Active Chat Header -->
+                        <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center min-w-0">
+                                <!-- Mobile Back Button -->
+                                <button type="button" class="btn btn-outline-secondary btn-sm d-md-none me-2 flex-shrink-0" onclick="showMobileList()">
+                                    <i class="fa-solid fa-arrow-left me-1"></i>Back
+                                </button>
+                                <div class="min-w-0">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h5 class="fw-bold text-dark mb-0 text-truncate" id="activeSellerName">Select a conversation</h5>
+                                        <span class="badge bg-warning text-dark d-none" id="activeCourseBadge">CODE</span>
+                                    </div>
+                                    <p class="text-muted small mb-1 text-truncate" id="activeBookTitle">Choose a chat from the list to view meetup details</p>
+                                    <span class="badge bg-light text-dark border d-none" id="activeMeetupBadge">
+                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><span id="activeMeetupText">Student Centre</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Delete Chat Button -->
+                            <div class="flex-shrink-0">
+                                <button type="button" class="btn btn-outline-danger btn-sm d-none" id="deleteChatBtn" onclick="promptDeleteChat()">
+                                    <i class="fa-solid fa-trash me-1"></i>Delete Chat
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Inline Delete Confirmation Alert (Replaces browser confirm()) -->
+                        <div class="alert alert-danger rounded-0 border-start-0 border-end-0 mb-0 py-2 px-3 d-none" id="deleteConfirmAlert" role="alert">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <span class="small fw-semibold text-dark" id="deleteConfirmText">Delete this conversation?</span>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-danger btn-sm fw-semibold px-3" onclick="confirmDeleteChat()">Yes, Delete</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold px-3" onclick="cancelDeleteChat()">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Messages Feed -->
+                        <div class="p-3 chat-messages-box flex-grow-1" id="chatMessagesBox">
+                            <div class="text-center text-muted py-5">
+                                <i class="fa-regular fa-comments display-4 mb-3 opacity-50"></i>
+                                <p class="small mb-0">Select a conversation to view messages and coordinate campus meetup.</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Reply Suggestions -->
+                        <div class="px-3 pt-2 pb-1 bg-white border-top d-flex gap-2 overflow-x-auto d-none" id="quickRepliesRow">
+                            <button type="button" class="btn btn-outline-secondary btn-sm quick-reply-btn" onclick="sendQuickReply('Is this textbook still available?')">
+                                Is this textbook still available?
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm quick-reply-btn" onclick="sendQuickReply('Can we meet at Student Centre today?')">
+                                Can we meet at Student Centre today?
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm quick-reply-btn" onclick="sendQuickReply('Confirmed, see you at the meetup spot!')">
+                                Confirmed, see you at the meetup spot!
+                            </button>
+                        </div>
+
+                        <!-- Message Composer Form -->
+                        <div class="p-3 pt-2 bg-white">
+                            <form id="sendMessageForm" class="d-flex gap-2">
+                                <input type="text" id="messageTextInput" class="form-control" placeholder="Write a message to coordinate meetup..." autocomplete="off" required disabled>
+                                <button type="submit" id="sendMessageBtn" class="btn btn-warning text-dark fw-semibold px-4 shadow-sm flex-shrink-0" disabled>
+                                    <i class="fa-solid fa-paper-plane me-1"></i>Send
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="text-white py-3 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
+    <!-- Footer (Exact match with marketplace.html) -->
+    <footer class="text-white py-4 border-top mt-auto site-footer text-center" style="background-color: var(--uitm-purple, #4A0E4E);">
         <div class="container">
-            <p class="mb-1 text-light small">&copy; 2026 RePage Marketplace. All rights reserved.</p>
-            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang &bull; Developed for IMS566</span>
+            <p class="mb-1 text-light small">© 2026 RePage Marketplace. All rights reserved.</p>
+            <span class="text-light opacity-75" style="font-size: 0.8rem;">A student marketplace prototype for UiTM Machang • Developed for IMS566</span>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS Bundle CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Messaging State & Responsive JS -->
+    <!-- Messages State & Direct repageMessages Synchronization Script -->
     <script>
-        const CHAT_STORAGE_KEY = 'repageMessages';
-        const CHAT_INITIALIZED_KEY = 'repageMessagesInitialized';
-        let currentChatId = null;
-        let chatsCache = [];
-        let pendingDeleteChatId = null;
+        const STORAGE_KEY = 'repageMessages';
+        const INIT_FLAG_KEY = 'repageMessagesInitialized';
+        const DELETED_KEY = 'repageDeletedMsgs';
 
-        // Default initial chats used only when the chat store has never been initialized
-        const defaultChats = [
+        let conversations = [];
+        let activeChatId = null;
+
+        // Demo chats
+        const DEMO_CONVERSATIONS = [
             {
-                id: 'chat-demo-1',
+                id: 'MSG-DEMO01',
+                title: 'Bahasa Mandarin Moden Komprehensif (2)',
+                code: 'ALL',
                 seller: 'Aiman Zikri',
-                book: 'Bahasa Mandarin Moden Komprehensif (2)',
-                code: 'TMC451',
-                meetup: 'Student Centre',
-                date: '18 Nov 2026',
-                messages: [
-                    { sender: 'buyer', text: 'Hi, is this textbook still available? Let me know when you are free for a campus meetup!', time: '18 Nov 2026' },
-                    { sender: 'seller', text: 'Hi! Yes, the book is available. We can meet up at Student Centre this week as requested.', time: '18 Nov 2026' }
+                message: 'Hi, is this textbook still available? Let me know when you are free for a campus meetup!',
+                location: 'Student Centre',
+                status: 'Seller Replied',
+                date: '21 Nov 2026',
+                thread: [
+                    {
+                        sender: 'You',
+                        text: 'Hi, is this textbook still available? Let me know when you are free for a campus meetup!',
+                        time: '10:15 AM'
+                    },
+                    {
+                        sender: 'Aiman Zikri',
+                        text: 'Hi! Yes, still available and in great condition. Can we meet at Student Centre around 2:30 PM today?',
+                        time: '10:19 AM'
+                    }
                 ]
             },
             {
-                id: 'chat-demo-2',
-                seller: 'Siti Nurhaliza',
-                book: 'Fundamentals of Entrepreneurship',
+                id: 'MSG-DEMO02',
+                title: 'Fundamentals of Entrepreneurship',
                 code: 'ENT300',
-                meetup: 'FIM Faculty Lobby',
-                date: '18 Nov 2026',
-                messages: [
-                    { sender: 'buyer', text: 'Hello, is the price for ENT300 negotiable?', time: '18 Nov 2026' },
-                    { sender: 'seller', text: 'Hi Sarah, yes we can do RM 25 fixed. Let me know if you want to COD today.', time: '18 Nov 2026' }
+                seller: 'Siti Nurhaliza',
+                message: 'Salam Siti, I would like to reserve your ENT300 book. Free to meet at Perpustakaan Tengku Anis (PTA)?',
+                location: 'Perpustakaan Tengku Anis (PTA)',
+                status: 'Seller Replied',
+                date: '20 Nov 2026',
+                thread: [
+                    {
+                        sender: 'You',
+                        text: 'Salam Siti, I would like to reserve your ENT300 book. Free to meet at Perpustakaan Tengku Anis (PTA)?',
+                        time: '3:40 PM'
+                    },
+                    {
+                        sender: 'Siti Nurhaliza',
+                        text: 'Wsalam! Sure, my class ends at 12 PM so we can meet at Perpustakaan Tengku Anis (PTA) lobby tomorrow.',
+                        time: '3:46 PM'
+                    }
+                ]
+            },
+            {
+                id: 'MSG-DEMO03',
+                title: 'Big Data: Analytic and Evaluation of Organisational Goals',
+                code: 'CDCS240',
+                seller: 'Daniel Ariff',
+                message: 'Hi Daniel, interested in your Big Data textbook. Can we COD at Block A?',
+                location: 'Block A',
+                status: 'Seller Replied',
+                date: '19 Nov 2026',
+                thread: [
+                    {
+                        sender: 'You',
+                        text: 'Hi Daniel, interested in your Big Data textbook. Can we COD at Block A?',
+                        time: '8:10 PM'
+                    },
+                    {
+                        sender: 'Daniel Ariff',
+                        text: 'Boleh! Let me know 10 minutes before you reach Block A ground floor.',
+                        time: '8:15 PM'
+                    }
                 ]
             }
         ];
 
-        function formatDisplayDate() {
-            const now = new Date();
-            return now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        function formatCurrentTime() {
+            return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         }
 
-        function normalizeChatThread(raw, fallbackIndex = 0) {
-            if (!raw || typeof raw !== 'object') return null;
+        function formatCurrentDate() {
+            return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
 
-            const seller = raw.seller || raw.sellerName || raw.name || raw.partner || 'Campus Seller';
-            const book = raw.book || raw.bookTitle || raw.title || raw.item || 'Academic Textbook';
-            const code = raw.code || raw.courseCode || raw.subjectCode || '';
-            const meetup = raw.meetup || raw.location || raw.meetupLocation || 'Student Centre';
-            const dateStr = raw.date || raw.time || formatDisplayDate();
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
-            let msgs = [];
-            if (Array.isArray(raw.messages) && raw.messages.length > 0) {
-                msgs = raw.messages.map(m => ({
-                    sender: m.sender === 'seller' ? 'seller' : 'buyer',
-                    text: m.text || m.message || m.body || '',
-                    time: m.time || m.date || dateStr
-                })).filter(m => m.text.trim() !== '');
-            } else if (typeof raw.message === 'string' && raw.message.trim() !== '') {
-                msgs = [{ sender: 'buyer', text: raw.message.trim(), time: dateStr }];
+        function getInitials(name) {
+            const parts = String(name || 'S').trim().split(/\s+/);
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function getDeletedIds() {
+            try {
+                const raw = localStorage.getItem(DELETED_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed.map(String) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveDeletedIds(ids) {
+            try {
+                localStorage.setItem(DELETED_KEY, JSON.stringify(ids));
+            } catch (e) {
+                console.warn('Unable to save deleted message IDs:', e);
+            }
+        }
+
+        function saveConversations() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+                localStorage.setItem(INIT_FLAG_KEY, 'true');
+            } catch (e) {
+                console.error('Error saving repageMessages:', e);
+            }
+        }
+
+        // Normalize items from repageMessages (including new reservations submitted by marketplace.html)
+        function normalizeMessageItem(item, index) {
+            if (!item || typeof item !== 'object') return null;
+
+            const id = String(item.id || `MSG-${Date.now()}-${index}`);
+            const title = String(item.title || 'Reserved Textbook').trim();
+            const code = String(item.code || 'ALL').trim();
+            const seller = String(item.seller || 'Senior Seller').trim();
+            const location = String(item.location || 'Student Centre').trim();
+            const date = String(item.date || formatCurrentDate()).trim();
+            const initialText = String(
+                item.message || `Hi, is "${title}" still available? Let me know when you are free for a campus meetup!`
+            ).trim();
+
+            let thread = [];
+            let wasNewlyNormalized = false;
+
+            if (Array.isArray(item.thread) && item.thread.length > 0) {
+                thread = item.thread.map(msg => ({
+                    sender: msg.sender === 'You' ? 'You' : seller,
+                    text: String(msg.text || '').trim(),
+                    time: String(msg.time || formatCurrentTime()).trim()
+                })).filter(m => m.text.length > 0);
+            } else {
+                // Brand new reservation created by marketplace.html!
+                wasNewlyNormalized = true;
+                const timeNow = formatCurrentTime();
+                thread = [
+                    {
+                        sender: 'You',
+                        text: initialText,
+                        time: timeNow
+                    },
+                    {
+                        sender: seller,
+                        text: `Hi! Thanks for reserving "${title}". Yes, it is available — let's meet at ${location}. What time works for you?`,
+                        time: timeNow
+                    }
+                ];
             }
 
-            if (msgs.length === 0) {
-                msgs = [{
-                    sender: 'buyer',
-                    text: `Hi ${seller}, I just reserved "${book}"${code ? ` (${code})` : ''}. Are you free to meet at ${meetup}?`,
-                    time: dateStr
-                }];
-            }
+            const lastMsg = thread[thread.length - 1];
 
             return {
-                id: String(raw.id || raw.chatId || raw.orderId || `chat-${Date.now()}-${fallbackIndex}`),
-                seller: seller,
-                book: book,
-                code: code,
-                meetup: meetup,
-                date: dateStr,
-                messages: msgs
+                normalized: {
+                    id,
+                    title,
+                    code,
+                    seller,
+                    message: lastMsg ? lastMsg.text : initialText,
+                    location,
+                    status: wasNewlyNormalized ? 'Seller Replied' : (item.status || 'Seller Replied'),
+                    date,
+                    thread
+                },
+                wasNewlyNormalized
             };
         }
 
-        function saveChatsToStorage(chats) {
-            const safeChats = Array.isArray(chats) ? chats : [];
-            chatsCache = safeChats;
+        function loadConversations() {
+            let rawList = null;
             try {
-                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(safeChats));
-                localStorage.setItem(CHAT_INITIALIZED_KEY, 'true');
-            } catch (err) {
-                console.warn('Unable to save chats to localStorage:', err);
-            }
-            return safeChats;
-        }
-
-        function loadBaseChatsFromStorage() {
-            let parsed = null;
-            try {
-                const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+                const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw !== null) {
-                    parsed = JSON.parse(raw);
+                    rawList = JSON.parse(raw);
                 }
-            } catch (err) {
-                console.warn('Unable to parse stored chats:', err);
+            } catch (e) {
+                console.warn('Corrupted repageMessages in localStorage:', e);
             }
 
-            if (Array.isArray(parsed)) {
-                return parsed.map((item, idx) => normalizeChatThread(item, idx)).filter(Boolean);
+            const deletedIds = getDeletedIds();
+            const isInitialized = localStorage.getItem(INIT_FLAG_KEY) === 'true';
+
+            if (!Array.isArray(rawList)) {
+                rawList = [];
             }
 
-            // First-time visit: seed demo chats once and mark store as initialized
-            const hasInitialized = localStorage.getItem(CHAT_INITIALIZED_KEY) === 'true';
-            if (!hasInitialized) {
-                const seeded = defaultChats.map(c => ({ ...c, messages: c.messages.map(m => ({ ...m })) }));
-                return saveChatsToStorage(seeded);
+            // Seed demo conversations if first visit and repageMessages is empty
+            if (rawList.length === 0 && !isInitialized) {
+                conversations = DEMO_CONVERSATIONS
+                    .filter(demo => !deletedIds.includes(demo.id))
+                    .map(demo => ({
+                        ...demo,
+                        thread: demo.thread.map(t => ({ ...t }))
+                    }));
+                saveConversations();
+                return;
             }
 
-            return saveChatsToStorage([]);
-        }
+            let needsSave = false;
+            let newestReservationId = null;
+            const parsedList = [];
 
-        function syncIncomingReservationsAndChats(existingChats) {
-            let chats = Array.isArray(existingChats) ? [...existingChats] : [];
-            let focusId = null;
-            let changed = false;
-
-            const addOrMergeThread = (candidate, shouldFocus = false) => {
-                const normalized = normalizeChatThread(candidate, chats.length);
-                if (!normalized) return;
-
-                const existingIdx = chats.findIndex(c =>
-                    String(c.id) === String(normalized.id) ||
-                    (c.seller.toLowerCase() === normalized.seller.toLowerCase() &&
-                     c.book.toLowerCase() === normalized.book.toLowerCase() &&
-                     c.meetup.toLowerCase() === normalized.meetup.toLowerCase())
-                );
-
-                if (existingIdx !== -1) {
-                    if (shouldFocus) focusId = chats[existingIdx].id;
-                } else {
-                    chats.unshift(normalized);
-                    changed = true;
-                    if (shouldFocus) focusId = normalized.id;
+            rawList.forEach((item, idx) => {
+                if (!item || typeof item !== 'object') return;
+                const itemId = String(item.id || '');
+                if (itemId && deletedIds.includes(itemId)) {
+                    needsSave = true;
+                    return;
                 }
-            };
 
-            // 1. Consume one-time pending chat payloads created when reserving in marketplace.html
-            const pendingKeys = ['repage_pending_chat', 'repagePendingChat', 'repageNewReservationChat'];
-            for (const pKey of pendingKeys) {
-                try {
-                    const rawPending = localStorage.getItem(pKey);
-                    if (rawPending) {
-                        const parsedPending = JSON.parse(rawPending);
-                        addOrMergeThread(parsedPending, true);
-                        localStorage.removeItem(pKey);
-                        changed = true;
-                    }
-                } catch (err) {
-                    console.warn(`Unable to parse ${pKey}:`, err);
-                }
-            }
-
-            // 2. Check reservations flagged with fromMarketplaceReserve in repageOrders
-            try {
-                const orders = JSON.parse(localStorage.getItem('repageOrders')) || [];
-                if (Array.isArray(orders)) {
-                    orders.forEach((order, idx) => {
-                        if (order && order.fromMarketplaceReserve && (order.title || order.book)) {
-                            const orderBook = order.title || order.book;
-                            const orderSeller = order.seller || 'Campus Seller';
-                            const threadId = `res-${order.id || idx}`;
-                            const alreadyExists = chats.some(c =>
-                                String(c.id) === String(threadId) ||
-                                (c.book.toLowerCase() === orderBook.toLowerCase() &&
-                                 c.seller.toLowerCase() === orderSeller.toLowerCase())
-                            );
-                            if (!alreadyExists) {
-                                addOrMergeThread({
-                                    id: threadId,
-                                    seller: orderSeller,
-                                    book: orderBook,
-                                    code: order.code || '',
-                                    meetup: order.location || order.meetup || 'Student Centre',
-                                    date: order.date || formatDisplayDate(),
-                                    messages: [
-                                        {
-                                            sender: 'buyer',
-                                            text: `Hi ${orderSeller}, I just reserved "${orderBook}"${order.code ? ` (${order.code})` : ''} for meetup at ${order.location || 'Student Centre'}.`,
-                                            time: order.date || formatDisplayDate()
-                                        }
-                                    ]
-                                }, idx === 0);
-                            }
+                const result = normalizeMessageItem(item, idx);
+                if (result) {
+                    parsedList.push(result.normalized);
+                    if (result.wasNewlyNormalized) {
+                        needsSave = true;
+                        if (!newestReservationId) {
+                            newestReservationId = result.normalized.id;
                         }
-                    });
-                }
-            } catch (err) {
-                console.warn('Unable to inspect repageOrders:', err);
-            }
-
-            // 3. Check URL query or hash parameters if navigated with chat details
-            try {
-                const params = new URLSearchParams(window.location.search);
-                let hashParams = new URLSearchParams();
-                if (window.location.hash && window.location.hash.includes('=')) {
-                    const cleanHash = window.location.hash.replace(/^#\/?/, '');
-                    hashParams = new URLSearchParams(cleanHash);
-                }
-
-                const getParam = (name) => params.get(name) || hashParams.get(name);
-                const paramSeller = getParam('seller') || getParam('sellerName');
-                const paramBook = getParam('book') || getParam('title') || getParam('bookTitle');
-                const paramCode = getParam('code') || getParam('courseCode') || '';
-                const paramMeetup = getParam('meetup') || getParam('location') || 'Student Centre';
-                const paramMsg = getParam('message') || '';
-
-                if (paramSeller || paramBook) {
-                    const resolvedSeller = paramSeller || 'Campus Seller';
-                    const resolvedBook = paramBook || 'Reserved Textbook';
-                    const existingMatch = chats.find(c =>
-                        c.seller.toLowerCase() === resolvedSeller.toLowerCase() &&
-                        c.book.toLowerCase() === resolvedBook.toLowerCase()
-                    );
-
-                    if (existingMatch) {
-                        focusId = existingMatch.id;
-                    } else {
-                        const dateNow = formatDisplayDate();
-                        addOrMergeThread({
-                            id: `url-${Date.now()}`,
-                            seller: resolvedSeller,
-                            book: resolvedBook,
-                            code: paramCode,
-                            meetup: paramMeetup,
-                            date: dateNow,
-                            messages: [
-                                {
-                                    sender: 'buyer',
-                                    text: paramMsg || `Hi ${resolvedSeller}, I'm interested in reserving "${resolvedBook}"${paramCode ? ` (${paramCode})` : ''} at ${paramMeetup}.`,
-                                    time: dateNow
-                                }
-                            ]
-                        }, true);
                     }
                 }
-            } catch (err) {
-                console.warn('Unable to parse URL parameters:', err);
+            });
+
+            conversations = parsedList;
+
+            
+            if (!isInitialized) {
+                DEMO_CONVERSATIONS.forEach(demo => {
+                    const alreadyExists = conversations.some(c => c.id === demo.id);
+                    if (!alreadyExists && !deletedIds.includes(demo.id)) {
+                        conversations.push({
+                            ...demo,
+                            thread: demo.thread.map(t => ({ ...t }))
+                        });
+                    }
+                });
+                needsSave = true;
             }
 
-            if (changed) {
-                saveChatsToStorage(chats);
-            } else {
-                chatsCache = chats;
+            if (needsSave) {
+                saveConversations();
             }
 
-            return { chats, focusId };
-        }
-
-        function getChats() {
-            return chatsCache;
+            if (newestReservationId) {
+                activeChatId = newestReservationId;
+            }
         }
 
         function renderChatList() {
-            const chats = getChats();
-            const listEl = document.getElementById('chatThreadsList');
-            listEl.innerHTML = '';
+            const listBody = document.getElementById('chatListBody');
+            const countBadge = document.getElementById('chatCountBadge');
+            const query = document.getElementById('chatSearchInput').value.trim().toLowerCase();
 
-            if (chats.length === 0) {
-                listEl.innerHTML = `
-                    <div class="p-4 text-center text-muted small">
-                        <i class="fa-regular fa-comments fs-3 mb-2 d-block opacity-50"></i>
-                        No active conversations yet.<br>
-                        <a href="marketplace.html" class="btn btn-sm btn-warning text-dark fw-semibold mt-2">Browse Marketplace</a>
+            countBadge.textContent = conversations.length;
+
+            const filtered = conversations.filter(chat =>
+                chat.seller.toLowerCase().includes(query) ||
+                chat.title.toLowerCase().includes(query) ||
+                chat.code.toLowerCase().includes(query) ||
+                chat.location.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                listBody.innerHTML = `
+                    <div class="p-4 text-center text-muted">
+                        <i class="fa-regular fa-comment-dots fa-2x mb-2 opacity-50"></i>
+                        <p class="small fw-semibold mb-2">${conversations.length === 0 ? 'No conversations yet.' : 'No matching conversations found.'}</p>
+                        <div class="d-flex flex-column gap-2 align-items-center">
+                            <a href="marketplace.html" class="btn btn-warning text-dark btn-sm fw-semibold px-3 shadow-sm">
+                                Browse Marketplace
+                            </a>
+                            ${conversations.length === 0 ? `
+                                <button type="button" class="btn btn-outline-secondary btn-sm px-3" onclick="restoreDemoChats()">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>Restore Demo Chats
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 `;
                 return;
             }
 
-            chats.forEach((chat) => {
-                const lastMsg = chat.messages[chat.messages.length - 1];
-                const isActive = String(currentChatId) === String(chat.id) ? 'active' : '';
-                const codeLabel = chat.code ? ` (${chat.code})` : '';
-                
-                const item = document.createElement('div');
-                item.className = `list-group-item list-group-item-action p-3 chat-item ${isActive}`;
-                item.onclick = () => selectChat(chat.id);
-                item.innerHTML = `
-                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                        <h6 class="mb-0 fw-bold text-dark">${chat.seller}</h6>
-                        <small class="text-muted" style="font-size: 0.75rem;">${lastMsg ? lastMsg.time : chat.date}</small>
+            listBody.innerHTML = filtered.map(chat => {
+                const lastMsg = chat.thread[chat.thread.length - 1];
+                const previewText = lastMsg
+                    ? `${lastMsg.sender === 'You' ? 'You: ' : ''}${lastMsg.text}`
+                    : chat.message;
+                const isSelected = chat.id === activeChatId;
+
+                return `
+                    <div class="p-3 chat-thread-item ${isSelected ? 'active' : ''}" onclick="openChat('${escapeHtml(chat.id)}')">
+                        <div class="d-flex align-items-start gap-2">
+                            <div class="seller-avatar mt-1">${escapeHtml(getInitials(chat.seller))}</div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex justify-content-between align-items-center gap-1 mb-1">
+                                    <span class="fw-bold text-dark text-truncate">${escapeHtml(chat.seller)}</span>
+                                    <small class="text-muted flex-shrink-0" style="font-size: 0.72rem;">${escapeHtml(chat.date)}</small>
+                                </div>
+                                <div class="small fw-semibold text-secondary text-truncate mb-1">
+                                    ${escapeHtml(chat.title)} <span class="badge bg-light text-dark border ms-1">${escapeHtml(chat.code)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <span class="small text-muted text-truncate" style="font-size: 0.8rem;">${escapeHtml(previewText)}</span>
+                                    <button type="button" class="btn btn-sm text-danger p-0 px-1 flex-shrink-0" title="Delete Chat"
+                                            onclick="event.stopPropagation(); deleteChatById('${escapeHtml(chat.id)}')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="mb-1 text-secondary small fw-semibold text-truncate">${chat.book}${codeLabel}</p>
-                    <small class="text-muted text-truncate d-block" style="font-size: 0.82rem;">${lastMsg ? lastMsg.text : 'No messages yet'}</small>
                 `;
-                listEl.appendChild(item);
-            });
+            }).join('');
         }
 
-        function selectChat(id) {
-            currentChatId = id;
-            cancelDeleteCurrentChat();
-            renderChatList();
-            renderActiveChatWindow();
-
-            // On mobile screen size, hide list and show conversation view
-            if (window.innerWidth < 768) {
-                document.getElementById('chatListCol').classList.add('mobile-hidden');
-                document.getElementById('chatWindowCol').classList.remove('mobile-hidden');
-            }
-        }
-
-        function showChatListMobile() {
-            cancelDeleteCurrentChat();
-            document.getElementById('chatListCol').classList.remove('mobile-hidden');
-            document.getElementById('chatWindowCol').classList.add('mobile-hidden');
-        }
-
-        function renderActiveChatWindow() {
-            const chats = getChats();
-            const chat = chats.find(c => String(c.id) === String(currentChatId));
-            const messagesArea = document.getElementById('chatMessagesArea');
+        function renderActiveChat() {
+            const sellerEl = document.getElementById('activeSellerName');
+            const courseBadgeEl = document.getElementById('activeCourseBadge');
+            const bookTitleEl = document.getElementById('activeBookTitle');
+            const meetupBadgeEl = document.getElementById('activeMeetupBadge');
+            const meetupTextEl = document.getElementById('activeMeetupText');
             const deleteBtn = document.getElementById('deleteChatBtn');
-            const badgeEl = document.getElementById('activeChatBadge');
-            const msgInput = document.getElementById('messageInput');
-            const sendBtn = document.querySelector('#messageForm button[type="submit"]');
+            const messagesBox = document.getElementById('chatMessagesBox');
+            const quickRepliesRow = document.getElementById('quickRepliesRow');
+            const msgInput = document.getElementById('messageTextInput');
+            const sendBtn = document.getElementById('sendMessageBtn');
+
+            const chat = conversations.find(c => c.id === activeChatId);
 
             if (!chat) {
-                currentChatId = null;
-                cancelDeleteCurrentChat();
-                document.getElementById('activeChatTitle').innerText = 'Select a conversation';
-                document.getElementById('activeChatSub').innerText = chats.length > 0
-                    ? 'Click any chat thread on the left to start messaging'
-                    : 'Reserve a textbook on the Marketplace to start a chat';
-                badgeEl.className = 'badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 small';
-                badgeEl.innerText = 'Idle';
+                activeChatId = null;
+                cancelDeleteChat();
+                sellerEl.textContent = 'Select a conversation';
+                courseBadgeEl.classList.add('d-none');
+                bookTitleEl.textContent = conversations.length > 0
+                    ? 'Select a conversation from the list to view messages'
+                    : 'Request a book in Marketplace to start chatting';
+                meetupBadgeEl.classList.add('d-none');
                 deleteBtn.classList.add('d-none');
+                quickRepliesRow.classList.add('d-none');
                 msgInput.disabled = true;
                 sendBtn.disabled = true;
 
-                messagesArea.innerHTML = `
+                messagesBox.innerHTML = `
                     <div class="text-center text-muted py-5">
-                        <i class="fa-regular fa-comment-dots display-4 mb-2 opacity-50"></i>
-                        <p class="small mb-2">No conversation selected.</p>
-                        ${chats.length === 0 ? '<a href="marketplace.html" class="btn btn-sm btn-warning text-dark fw-semibold">Go to Marketplace</a>' : ''}
+                        <i class="fa-regular fa-comments display-4 mb-3 opacity-50"></i>
+                        <p class="small mb-0">No conversation selected.</p>
                     </div>
                 `;
                 return;
             }
 
+            sellerEl.textContent = chat.seller;
+            courseBadgeEl.textContent = chat.code;
+            courseBadgeEl.classList.remove('d-none');
+            bookTitleEl.textContent = chat.title;
+            meetupTextEl.textContent = `Meetup: ${chat.location}`;
+            meetupBadgeEl.classList.remove('d-none');
+            deleteBtn.classList.remove('d-none');
+            quickRepliesRow.classList.remove('d-none');
             msgInput.disabled = false;
             sendBtn.disabled = false;
-            deleteBtn.classList.remove('d-none');
-            badgeEl.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small';
-            badgeEl.innerText = 'Active';
 
-            const codePart = chat.code ? ` (${chat.code})` : '';
-            document.getElementById('activeChatTitle').innerText = `${chat.seller} - ${chat.book}${codePart}`;
-            document.getElementById('activeChatSub').innerHTML = `<i class="fa-solid fa-location-dot text-danger me-1"></i>Meetup Location: ${chat.meetup}`;
-
-            messagesArea.innerHTML = '';
-            chat.messages.forEach(msg => {
-                const isOutgoing = msg.sender === 'buyer';
-                const wrapper = document.createElement('div');
-                wrapper.className = `d-flex mb-3 ${isOutgoing ? 'justify-content-end' : 'justify-content-start'}`;
-                
-                wrapper.innerHTML = `
-                    <div class="message-bubble ${isOutgoing ? 'message-outgoing' : 'message-incoming'}">
-                        <div class="small fw-bold mb-1 opacity-75" style="font-size: 0.72rem;">${isOutgoing ? 'You (Student)' : chat.seller}</div>
-                        <div>${msg.text}</div>
-                        <div class="text-end text-muted mt-1" style="font-size: 0.65rem; color: ${isOutgoing ? 'rgba(255,255,255,0.8) !important' : '#888'}">${msg.time}</div>
+            messagesBox.innerHTML = chat.thread.map(msg => {
+                const isYou = msg.sender === 'You';
+                return `
+                    <div class="d-flex flex-column mb-3 ${isYou ? 'align-items-end' : 'align-items-start'}">
+                        <span class="badge mb-1 ${isYou ? 'bg-secondary text-white' : 'bg-warning text-dark'}" style="font-size: 0.7rem;">
+                            ${escapeHtml(isYou ? 'You' : chat.seller)} &bull; ${escapeHtml(msg.time)}
+                        </span>
+                        <div class="chat-bubble ${isYou ? 'chat-bubble-you' : 'chat-bubble-seller'}">
+                            ${escapeHtml(msg.text)}
+                        </div>
                     </div>
                 `;
-                messagesArea.appendChild(wrapper);
+            }).join('');
+
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        // Mobile Single-Pane View Switchers (< 768px)
+        function showMobileList() {
+            cancelDeleteChat();
+            const wrapper = document.getElementById('messagesWrapper');
+            wrapper.classList.remove('mobile-show-chat');
+            wrapper.classList.add('mobile-show-list');
+        }
+
+        function showMobileChat() {
+            const wrapper = document.getElementById('messagesWrapper');
+            wrapper.classList.remove('mobile-show-list');
+            wrapper.classList.add('mobile-show-chat');
+        }
+
+        function openChat(chatId) {
+            activeChatId = chatId;
+            cancelDeleteChat();
+            renderChatList();
+            renderActiveChat();
+
+            if (window.innerWidth < 768) {
+                showMobileChat();
+            }
+        }
+
+        // Delete Chat Handlers
+        function promptDeleteChat() {
+            if (!activeChatId) return;
+            const chat = conversations.find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            document.getElementById('deleteConfirmText').textContent = `Delete conversation with ${chat.seller} (${chat.title})?`;
+            document.getElementById('deleteConfirmAlert').classList.remove('d-none');
+        }
+
+        function cancelDeleteChat() {
+            document.getElementById('deleteConfirmAlert').classList.add('d-none');
+        }
+
+        function confirmDeleteChat() {
+            if (!activeChatId) return;
+            deleteChatById(activeChatId);
+        }
+
+        function deleteChatById(chatId) {
+            const deletedIds = getDeletedIds();
+            if (!deletedIds.includes(chatId)) {
+                deletedIds.push(chatId);
+                saveDeletedIds(deletedIds);
+            }
+
+            conversations = conversations.filter(c => c.id !== chatId);
+            saveConversations();
+            cancelDeleteChat();
+
+            if (activeChatId === chatId) {
+                activeChatId = conversations.length > 0 ? conversations[0].id : null;
+            }
+
+            renderChatList();
+            renderActiveChat();
+
+            if (window.innerWidth < 768) {
+                showMobileList();
+            }
+        }
+
+        function restoreDemoChats() {
+            const deletedIds = getDeletedIds();
+            const demoIds = DEMO_CONVERSATIONS.map(d => d.id);
+            saveDeletedIds(deletedIds.filter(id => !demoIds.includes(id)));
+
+            DEMO_CONVERSATIONS.forEach(demo => {
+                if (!conversations.some(c => c.id === demo.id)) {
+                    conversations.push({
+                        ...demo,
+                        thread: demo.thread.map(t => ({ ...t }))
+                    });
+                }
             });
 
-            // Scroll to bottom of chat
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-
-        function requestDeleteCurrentChat() {
-            if (!currentChatId) return;
-            const target = chatsCache.find(c => String(c.id) === String(currentChatId));
-            if (!target) return;
-
-            pendingDeleteChatId = target.id;
-            const banner = document.getElementById('deleteConfirmBanner');
-            const label = document.getElementById('deleteConfirmText');
-            label.textContent = `Delete chat with ${target.seller} (${target.book})?`;
-            banner.classList.remove('d-none');
-        }
-
-        function cancelDeleteCurrentChat() {
-            pendingDeleteChatId = null;
-            const banner = document.getElementById('deleteConfirmBanner');
-            if (banner) {
-                banner.classList.add('d-none');
+            saveConversations();
+            if (!activeChatId && conversations.length > 0) {
+                activeChatId = conversations[0].id;
             }
+            renderChatList();
+            renderActiveChat();
         }
 
-        function confirmDeleteCurrentChat() {
-            if (!pendingDeleteChatId) return;
-
-            const updated = chatsCache.filter(c => String(c.id) !== String(pendingDeleteChatId));
-            saveChatsToStorage(updated);
-            pendingDeleteChatId = null;
-            cancelDeleteCurrentChat();
-
-            if (updated.length === 0) {
-                currentChatId = null;
-                renderChatList();
-                renderActiveChatWindow();
-                if (window.innerWidth < 768) {
-                    showChatListMobile();
-                }
-            } else {
-                currentChatId = updated[0].id;
-                renderChatList();
-                renderActiveChatWindow();
-            }
+        // Send New Message
+        function sendQuickReply(text) {
+            if (!activeChatId) return;
+            const input = document.getElementById('messageTextInput');
+            input.value = text;
+            document.getElementById('sendMessageForm').dispatchEvent(new Event('submit'));
         }
 
-        function sendChatMessage(e) {
+        document.getElementById('sendMessageForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!currentChatId) return;
+            if (!activeChatId) return;
 
-            const input = document.getElementById('messageInput');
+            const input = document.getElementById('messageTextInput');
             const text = input.value.trim();
             if (!text) return;
 
-            const chatIndex = chatsCache.findIndex(c => String(c.id) === String(currentChatId));
-            if (chatIndex !== -1) {
-                const timeStr = formatDisplayDate();
-                chatsCache[chatIndex].messages.push({
-                    sender: 'buyer',
-                    text: text,
-                    time: timeStr
+            const idx = conversations.findIndex(c => c.id === activeChatId);
+            if (idx === -1) return;
+
+            const targetId = activeChatId;
+            const timeNow = formatCurrentTime();
+
+            conversations[idx].thread.push({
+                sender: 'You',
+                text: text,
+                time: timeNow
+            });
+            conversations[idx].message = text;
+            conversations[idx].date = formatCurrentDate();
+            conversations[idx].status = 'Sent';
+
+            // Move updated thread to the top of repageMessages
+            const [updatedChat] = conversations.splice(idx, 1);
+            conversations.unshift(updatedChat);
+            saveConversations();
+
+            input.value = '';
+            renderChatList();
+            renderActiveChat();
+
+            // Simulated Seller Auto-Reply after 850ms
+            setTimeout(() => {
+                const replyIdx = conversations.findIndex(c => c.id === targetId);
+                if (replyIdx === -1) return;
+
+                const sellerName = conversations[replyIdx].seller;
+                const meetupSpot = conversations[replyIdx].location;
+                const lower = text.toLowerCase();
+
+                let replyText = `Noted! Let's meet at ${meetupSpot}. Just message me when you're on your way.`;
+                if (lower.includes('available')) {
+                    replyText = `Yes, still available! Would you like to meet at ${meetupSpot} today?`;
+                } else if (lower.includes('student centre') || lower.includes('meet')) {
+                    replyText = `Sure, ${meetupSpot} works great for me! What time are you free?`;
+                } else if (lower.includes('confirm') || lower.includes('see you')) {
+                    replyText = `Confirmed! See you at ${meetupSpot}.`;
+                }
+
+                conversations[replyIdx].thread.push({
+                    sender: sellerName,
+                    text: replyText,
+                    time: formatCurrentTime()
                 });
+                conversations[replyIdx].message = replyText;
+                conversations[replyIdx].status = 'Seller Replied';
+                saveConversations();
 
-                saveChatsToStorage(chatsCache);
-                input.value = '';
                 renderChatList();
-                renderActiveChatWindow();
-            }
-        }
+                if (activeChatId === targetId) {
+                    renderActiveChat();
+                }
+            }, 850);
+        });
 
-        // Listen for cross-tab or storage updates from marketplace reservations
-        window.addEventListener('storage', function(event) {
-            if ([CHAT_STORAGE_KEY, 'repage_pending_chat', 'repageOrders'].includes(event.key)) {
-                const base = loadBaseChatsFromStorage();
-                const synced = syncIncomingReservationsAndChats(base);
-                if (!currentChatId && synced.chats.length > 0) {
-                    currentChatId = synced.chats[0].id;
+        document.getElementById('chatSearchInput').addEventListener('input', renderChatList);
+
+        // Sync across tabs or browser back/forward navigation
+        window.addEventListener('storage', function(e) {
+            if (e.key === STORAGE_KEY) {
+                loadConversations();
+                if (!conversations.some(c => c.id === activeChatId)) {
+                    activeChatId = conversations.length > 0 ? conversations[0].id : null;
                 }
                 renderChatList();
-                renderActiveChatWindow();
+                renderActiveChat();
             }
         });
 
-        // Initialize on load
-        window.onload = function() {
-            const baseChats = loadBaseChatsFromStorage();
-            const synced = syncIncomingReservationsAndChats(baseChats);
-            const chats = synced.chats;
+        function initMessagesPage() {
+            const hadPreviousActive = activeChatId;
+            loadConversations();
 
-            if (chats.length > 0) {
-                const hasCurrent = currentChatId && chats.some(c => String(c.id) === String(currentChatId));
-                const targetId = synced.focusId || (hasCurrent ? currentChatId : chats[0].id);
-                selectChat(targetId);
-            } else {
-                renderChatList();
-                renderActiveChatWindow();
+            if (!activeChatId || !conversations.some(c => c.id === activeChatId)) {
+                activeChatId = conversations.length > 0 ? conversations[0].id : null;
             }
 
-            // Responsive mobile view check
-            if (window.innerWidth < 768 && chats.length > 0 && !synced.focusId) {
-                document.getElementById('chatWindowCol').classList.add('mobile-hidden');
-            }
-        };
+            renderChatList();
+            renderActiveChat();
 
-        // Handle resize layout adjustments
-        window.onresize = function() {
-            if (window.innerWidth >= 768) {
-                document.getElementById('chatListCol').classList.remove('mobile-hidden');
-                document.getElementById('chatWindowCol').classList.remove('mobile-hidden');
+            // On mobile (< 768px), always default to the Conversations List unless a brand-new reservation just arrived
+            if (window.innerWidth < 768) {
+                if (!hadPreviousActive && activeChatId && conversations[0] && conversations[0].id === activeChatId && !activeChatId.startsWith('MSG-DEMO')) {
+                    showMobileChat();
+                } else {
+                    showMobileList();
+                }
             }
-        };
+        }
+
+        window.addEventListener('DOMContentLoaded', initMessagesPage);
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                initMessagesPage();
+            }
+        });
     </script>
 </body>
 </html>
